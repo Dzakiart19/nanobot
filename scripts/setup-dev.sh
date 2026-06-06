@@ -60,7 +60,7 @@ ws["tokenIssueSecret"] = password
 img = config.setdefault("tools", {}).setdefault("image_generation", {})
 img["enabled"]  = True
 img["provider"] = "custom"
-img["model"]    = "gptfree"
+img["model"]    = "qwen-wan"
 
 with open(config_file, "w") as f:
     json.dump(config, f, indent=2)
