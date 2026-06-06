@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -e
 
+# Install / verify all skill dependencies
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+bash "$SCRIPT_DIR/install-deps.sh"
+
 # Remove stale non-editable dzeck install that overrides workspace source.
 # The editable .pth file (_editable_impl_dzeck_ai.pth) already points to
 # /home/runner/workspace, so a plain "dzeck" directory in site-packages
