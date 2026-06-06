@@ -1,10 +1,24 @@
 #!/usr/bin/env bash
 set -e
 
+# Remove stale non-editable nanobot install that overrides workspace source.
+# The editable .pth file (_editable_impl_nanobot_ai.pth) already points to
+# /home/runner/workspace, so a plain "nanobot" directory in site-packages
+# would shadow it and serve stale code.
+SITE_PKG="$HOME/workspace/.pythonlibs/lib/python3.11/site-packages"
+if [ -d "$SITE_PKG/nanobot" ]; then
+    echo "Removing stale nanobot install from site-packages..."
+    rm -rf "$SITE_PKG/nanobot"
+fi
+
 # Install Python package if nanobot command not found
 if ! command -v nanobot &> /dev/null; then
     echo "Installing Dzeck engine (nanobot package)..."
     pip install -e . -q
+    # After editable install, ensure no plain directory copy shadowed it
+    if [ -d "$SITE_PKG/nanobot" ]; then
+        rm -rf "$SITE_PKG/nanobot"
+    fi
 fi
 
 # Create Dzeck config if it doesn't exist

@@ -9,6 +9,7 @@ Also houses shared HTTP utility functions used by both this module and
 
 from __future__ import annotations
 
+import asyncio
 import json
 import mimetypes
 import re
@@ -179,9 +180,17 @@ class GatewayHTTPHandler:
             if got == issue_expected:
                 return self._handle_token_issue(connection, request)
 
-        # Bootstrap
+        # Auth routes (public — no token required)
+        if got == "/api/auth/login":
+            return await self._handle_auth_login(request)
+        if got == "/api/auth/signup":
+            return await self._handle_auth_signup(request)
+
+        # Bootstrap + signup (auth is handled inside these handlers)
         if got == "/webui/bootstrap":
             return self._handle_bootstrap(connection, request)
+        if got == "/webui/signup":
+            return self._handle_signup(request)
 
         # Settings routes (delegated)
         response = await self.settings_routes.dispatch(request, got)
@@ -239,12 +248,31 @@ class GatewayHTTPHandler:
     # -- Bootstrap ----------------------------------------------------------
 
     def _handle_bootstrap(self, connection: Any, request: Any) -> Response:
-        secret = self.config.token_issue_secret.strip() or self.config.token.strip()
-        if secret:
-            if not _issue_route_secret_matches(request.headers, secret):
-                return _http_error(401, "Unauthorized")
-        elif not _is_localhost(connection):
-            return _http_error(403, "bootstrap is localhost-only")
+        headers = getattr(request, "headers", {}) or {}
+        email = _case_insensitive_header(headers, "X-Auth-Email") or ""
+        password = _case_insensitive_header(headers, "X-Auth-Password") or ""
+
+        if email and password:
+            # MongoDB auth path
+            try:
+                from nanobot.auth.mongodb_auth import login_user
+                login_user(email.strip().lower(), password)
+            except ValueError as exc:
+                return _http_json_response({"error": str(exc)}, status=401)
+            except RuntimeError as exc:
+                self._log.error("bootstrap mongodb config error: {}", exc)
+                return _http_json_response({"error": "Auth service unavailable"}, status=503)
+            except Exception as exc:
+                self._log.error("bootstrap mongodb error: {}", exc)
+                return _http_json_response({"error": "Login failed"}, status=500)
+        else:
+            # Original secret-based auth
+            secret = self.config.token_issue_secret.strip() or self.config.token.strip()
+            if secret:
+                if not _issue_route_secret_matches(request.headers, secret):
+                    return _http_error(401, "Unauthorized")
+            elif not _is_localhost(connection):
+                return _http_error(403, "bootstrap is localhost-only")
 
         if not self.tokens.can_issue(include_api_token=True):
             return _http_response(
@@ -268,6 +296,45 @@ class GatewayHTTPHandler:
             }
         )
 
+    def _handle_signup(self, request: Any) -> Response:
+        """Create a new user account and issue a bootstrap token."""
+        headers = getattr(request, "headers", {}) or {}
+        name = _case_insensitive_header(headers, "X-Auth-Name") or ""
+        email = _case_insensitive_header(headers, "X-Auth-Email") or ""
+        password = _case_insensitive_header(headers, "X-Auth-Password") or ""
+        query = _parse_query(request.path)
+        name = name or _query_first(query, "name") or ""
+        email = email or _query_first(query, "email") or ""
+        password = password or _query_first(query, "password") or ""
+
+        try:
+            from nanobot.auth.mongodb_auth import signup_user
+            signup_user(name, email.strip().lower(), password)
+        except ValueError as exc:
+            return _http_json_response({"error": str(exc)}, status=400)
+        except RuntimeError as exc:
+            self._log.error("signup mongodb config error: {}", exc)
+            return _http_json_response({"error": "Auth service unavailable"}, status=503)
+        except Exception as exc:
+            self._log.error("signup mongodb error: {}", exc)
+            return _http_json_response({"error": "Signup failed"}, status=500)
+
+        if not self.tokens.can_issue(include_api_token=True):
+            return _http_json_response({"error": "Too many outstanding tokens"}, status=429)
+        token = self.tokens.issue_token(self.config.token_ttl_s, api_token=True)
+        expected_path = _normalize_config_path(self.config.path)
+        return _http_json_response(
+            {
+                "token": token,
+                "ws_path": expected_path,
+                "ws_url": self._bootstrap_ws_url(request),
+                "expires_in": self.config.token_ttl_s,
+                "model_name": _resolve_bootstrap_model_name(self.runtime_model_name),
+                "runtime_surface": self._runtime_surface,
+                "runtime_capabilities": self._capabilities,
+            }
+        )
+
     def _bootstrap_ws_url(self, request: Any) -> str:
         headers = getattr(request, "headers", {}) or {}
         host = _safe_host_header(_case_insensitive_header(headers, "Host"))
@@ -279,6 +346,76 @@ class GatewayHTTPHandler:
         scheme = "wss" if secure else "ws"
         expected_path = _normalize_config_path(self.config.path)
         return f"{scheme}://{host}{expected_path}"
+
+    def _issue_bootstrap_token(self, request: Any) -> dict[str, Any]:
+        """Issue a bootstrap token and return the response payload."""
+        token = self.tokens.issue_token(self.config.token_ttl_s, api_token=True)
+        expected_path = _normalize_config_path(self.config.path)
+        return {
+            "token": token,
+            "ws_path": expected_path,
+            "ws_url": self._bootstrap_ws_url(request),
+            "expires_in": self.config.token_ttl_s,
+            "model_name": _resolve_bootstrap_model_name(self.runtime_model_name),
+            "runtime_surface": self._runtime_surface,
+            "runtime_capabilities": self._capabilities,
+        }
+
+    # -- MongoDB auth routes (public) ---------------------------------------
+
+    async def _handle_auth_login(self, request: WsRequest) -> Response:
+        """Login with email + password via MongoDB."""
+        try:
+            from nanobot.auth.mongodb_auth import login_user
+
+            headers = getattr(request, "headers", {}) or {}
+            email = _case_insensitive_header(headers, "X-Auth-Email") or ""
+            password = _case_insensitive_header(headers, "X-Auth-Password") or ""
+            query = _parse_query(request.path)
+            email = email or _query_first(query, "email") or ""
+            password = password or _query_first(query, "password") or ""
+
+            await asyncio.to_thread(login_user, email, password)
+
+            if not self.tokens.can_issue(include_api_token=True):
+                return _http_error(429, "Too many outstanding tokens")
+            return _http_json_response(self._issue_bootstrap_token(request))
+        except ValueError as exc:
+            return _http_json_response({"error": str(exc)}, status=401)
+        except RuntimeError as exc:
+            self._log.error("auth login config error: {}", exc)
+            return _http_json_response({"error": "Auth service unavailable"}, status=503)
+        except Exception as exc:
+            self._log.error("auth login error: {}", exc)
+            return _http_json_response({"error": "Login failed"}, status=500)
+
+    async def _handle_auth_signup(self, request: WsRequest) -> Response:
+        """Register a new user via MongoDB and auto-login."""
+        try:
+            from nanobot.auth.mongodb_auth import signup_user
+
+            headers = getattr(request, "headers", {}) or {}
+            name = _case_insensitive_header(headers, "X-Auth-Name") or ""
+            email = _case_insensitive_header(headers, "X-Auth-Email") or ""
+            password = _case_insensitive_header(headers, "X-Auth-Password") or ""
+            query = _parse_query(request.path)
+            name = name or _query_first(query, "name") or ""
+            email = email or _query_first(query, "email") or ""
+            password = password or _query_first(query, "password") or ""
+
+            await asyncio.to_thread(signup_user, name, email, password)
+
+            if not self.tokens.can_issue(include_api_token=True):
+                return _http_error(429, "Too many outstanding tokens")
+            return _http_json_response(self._issue_bootstrap_token(request))
+        except ValueError as exc:
+            return _http_json_response({"error": str(exc)}, status=400)
+        except RuntimeError as exc:
+            self._log.error("auth signup config error: {}", exc)
+            return _http_json_response({"error": "Auth service unavailable"}, status=503)
+        except Exception as exc:
+            self._log.error("auth signup error: {}", exc)
+            return _http_json_response({"error": "Signup failed"}, status=500)
 
     # -- Session routes -----------------------------------------------------
 

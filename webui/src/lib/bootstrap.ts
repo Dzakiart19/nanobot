@@ -2,6 +2,8 @@ import type { BootstrapResponse } from "./types";
 import { fetchWithTimeout } from "./http";
 
 const SECRET_STORAGE_KEY = "nanobot-webui.bootstrap-secret";
+const EMAIL_STORAGE_KEY = "nanobot-webui.user-email";
+const PASSWORD_SESSION_KEY = "nanobot-webui.session-password";
 
 /** Read a previously saved bootstrap secret from localStorage. */
 export function loadSavedSecret(): string {
@@ -31,6 +33,51 @@ export function clearSavedSecret(): void {
   }
 }
 
+/** Read the saved user email from localStorage. */
+export function loadSavedEmail(): string {
+  if (typeof window === "undefined") return "";
+  try {
+    return window.localStorage.getItem(EMAIL_STORAGE_KEY) ?? "";
+  } catch {
+    return "";
+  }
+}
+
+/** Persist the user email to localStorage. */
+export function saveEmail(email: string): void {
+  try {
+    window.localStorage.setItem(EMAIL_STORAGE_KEY, email);
+  } catch {}
+}
+
+/** Read the session password from sessionStorage (cleared on tab close). */
+export function loadSessionPassword(): string {
+  if (typeof window === "undefined") return "";
+  try {
+    return window.sessionStorage.getItem(PASSWORD_SESSION_KEY) ?? "";
+  } catch {
+    return "";
+  }
+}
+
+/** Persist the session password to sessionStorage. */
+export function saveSessionPassword(pw: string): void {
+  try {
+    window.sessionStorage.setItem(PASSWORD_SESSION_KEY, pw);
+  } catch {}
+}
+
+/** Clear all auth session data (sign out). */
+export function clearAuthSession(): void {
+  try {
+    window.localStorage.removeItem(EMAIL_STORAGE_KEY);
+  } catch {}
+  try {
+    window.sessionStorage.removeItem(PASSWORD_SESSION_KEY);
+  } catch {}
+  clearSavedSecret();
+}
+
 /**
  * Fetch a short-lived token + the WebSocket path from the gateway's
  * ``/webui/bootstrap`` endpoint.
@@ -55,6 +102,72 @@ export async function fetchBootstrap(
   const body = (await res.json()) as BootstrapResponse;
   if (!body.token || !body.ws_path) {
     throw new Error("bootstrap response missing token or ws_path");
+  }
+  return body;
+}
+
+/**
+ * Login with email + password via MongoDB auth.
+ * Uses /webui/bootstrap with X-Auth-Email and X-Auth-Password headers.
+ */
+export async function fetchAuthLogin(
+  email: string,
+  password: string,
+  timeoutMs?: number,
+): Promise<BootstrapResponse> {
+  const res = await fetchWithTimeout("/webui/bootstrap", {
+    method: "GET",
+    credentials: "same-origin",
+    headers: {
+      "X-Auth-Email": email,
+      "X-Auth-Password": password,
+    },
+  }, timeoutMs);
+  if (!res.ok) {
+    let errMsg = `Login failed: HTTP ${res.status}`;
+    try {
+      const body = (await res.json()) as { error?: string };
+      if (body.error) errMsg = body.error;
+    } catch {}
+    throw new Error(errMsg);
+  }
+  const body = (await res.json()) as BootstrapResponse;
+  if (!body.token || !body.ws_path) {
+    throw new Error("Login response missing token or ws_path");
+  }
+  return body;
+}
+
+/**
+ * Register a new account via MongoDB auth.
+ * Uses /webui/signup which creates the user then issues a bootstrap token.
+ */
+export async function fetchAuthSignup(
+  name: string,
+  email: string,
+  password: string,
+  timeoutMs?: number,
+): Promise<BootstrapResponse> {
+  const res = await fetchWithTimeout("/webui/signup", {
+    method: "GET",
+    credentials: "same-origin",
+    headers: {
+      "X-Auth-Name": name,
+      "X-Auth-Email": email,
+      "X-Auth-Password": password,
+    },
+  }, timeoutMs);
+  if (!res.ok) {
+    let errMsg = `Signup failed: HTTP ${res.status}`;
+    try {
+      const body = (await res.json()) as { error?: string };
+      if (body.error) errMsg = body.error;
+    } catch {}
+    throw new Error(errMsg);
+  }
+  const body = (await res.json()) as BootstrapResponse;
+  if (!body.token || !body.ws_path) {
+    throw new Error("Signup response missing token or ws_path");
   }
   return body;
 }

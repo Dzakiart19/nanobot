@@ -15,11 +15,14 @@ import { useSidebarState } from "@/hooks/useSidebarState";
 import { ThemeProvider, useTheme } from "@/hooks/useTheme";
 import { cn } from "@/lib/utils";
 import {
-  clearSavedSecret,
+  clearAuthSession,
   deriveWsUrl,
-  fetchBootstrap,
-  loadSavedSecret,
-  saveSecret,
+  fetchAuthLogin,
+  fetchAuthSignup,
+  loadSavedEmail,
+  loadSessionPassword,
+  saveEmail,
+  saveSessionPassword,
 } from "@/lib/bootstrap";
 import { deriveTitle } from "@/lib/format";
 import { NanobotClient } from "@/lib/nanobot-client";
@@ -164,56 +167,120 @@ function tokenRefreshDelayMs(expiresAt: number): number {
   return Math.max(TOKEN_REFRESH_MIN_DELAY_MS, remaining - margin);
 }
 
-function AuthForm({
-  failed,
-  onSecret,
+type AuthMode = "login" | "signup";
+
+function LoginSignupForm({
+  errorMsg,
+  onLogin,
+  onSignup,
 }: {
-  failed: boolean;
-  onSecret: (secret: string) => void;
+  errorMsg: string | null;
+  onLogin: (email: string, password: string) => void;
+  onSignup: (name: string, email: string, password: string) => void;
 }) {
-  const { t } = useTranslation();
-  const [value, setValue] = useState("");
+  const [mode, setMode] = useState<AuthMode>("login");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState(() => loadSavedEmail());
+  const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const secret = value.trim();
-    if (!secret) return;
+    if (submitting) return;
     setSubmitting(true);
-    onSecret(secret);
+    if (mode === "login") {
+      onLogin(email.trim(), password);
+    } else {
+      onSignup(name.trim(), email.trim(), password);
+    }
   };
+
+  const canSubmit =
+    !submitting &&
+    email.trim() !== "" &&
+    password !== "" &&
+    (mode === "login" || name.trim() !== "");
 
   return (
     <div className="flex h-full w-full items-center justify-center px-6">
-      <form
-        onSubmit={handleSubmit}
-        className="flex w-full max-w-sm flex-col gap-4"
-      >
+      <div className="flex w-full max-w-sm flex-col gap-5">
         <div className="flex flex-col items-center gap-1 text-center">
-          <p className="text-lg font-semibold">{t("app.auth.title")}</p>
-          <p className="text-sm text-muted-foreground">{t("app.auth.hint")}</p>
+          <p className="text-2xl font-bold tracking-tight">Dzeck</p>
+          <p className="text-sm text-muted-foreground">Your personal AI assistant</p>
         </div>
-        {failed && (
-          <p className="text-center text-sm text-destructive">
-            {t("app.auth.invalid")}
+
+        <div className="flex rounded-lg border bg-muted/40 p-1 text-sm">
+          <button
+            type="button"
+            onClick={() => { setMode("login"); setSubmitting(false); }}
+            className={cn(
+              "flex-1 rounded-md px-3 py-1.5 font-medium transition-colors",
+              mode === "login"
+                ? "bg-background shadow-sm"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            Sign In
+          </button>
+          <button
+            type="button"
+            onClick={() => { setMode("signup"); setSubmitting(false); }}
+            className={cn(
+              "flex-1 rounded-md px-3 py-1.5 font-medium transition-colors",
+              mode === "signup"
+                ? "bg-background shadow-sm"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            Create Account
+          </button>
+        </div>
+
+        {errorMsg && (
+          <p className="rounded-md bg-destructive/10 px-3 py-2 text-center text-sm text-destructive">
+            {errorMsg}
           </p>
         )}
-        <Input
-          type="password"
-          placeholder={t("app.auth.placeholder")}
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          disabled={submitting}
-          autoFocus
-        />
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={!value.trim() || submitting}
-        >
-          {t("app.auth.submit")}
-        </Button>
-      </form>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          {mode === "signup" && (
+            <Input
+              type="text"
+              placeholder="Full name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              disabled={submitting}
+              autoFocus={mode === "signup"}
+            />
+          )}
+          <Input
+            type="email"
+            placeholder="Email address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={submitting}
+            autoFocus={mode === "login"}
+          />
+          <Input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={submitting}
+          />
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={!canSubmit}
+          >
+            {submitting
+              ? "Please wait…"
+              : mode === "login"
+              ? "Sign In"
+              : "Create Account"}
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }
@@ -316,17 +383,21 @@ function HostChrome({
 export default function App() {
   const { t } = useTranslation();
   const [state, setState] = useState<BootState>({ status: "loading" });
-  const bootstrapSecretRef = useRef("");
+  const [authError, setAuthError] = useState<string | null>(null);
+  const authCredsRef = useRef({ email: "", password: "" });
 
-  const bootstrapWithSecret = useCallback(
-    (secret: string) => {
+  const bootstrapWithCredentials = useCallback(
+    (email: string, password: string) => {
       let cancelled = false;
       (async () => {
         setState({ status: "loading" });
+        setAuthError(null);
         try {
-          const boot = await fetchBootstrap("", secret);
+          const boot = await fetchAuthLogin(email, password);
           if (cancelled) return;
-          if (secret) saveSecret(secret);
+          saveEmail(email);
+          saveSessionPassword(password);
+          authCredsRef.current = { email, password };
           const url = deriveWsUrl(boot.ws_path, boot.token, boot.ws_url);
           const runtimeSurface = toRuntimeSurface(boot.runtime_surface);
           const runtimeHost = createRuntimeHost(runtimeSurface, boot.runtime_capabilities);
@@ -335,7 +406,8 @@ export default function App() {
             socketFactory: runtimeHost.socketFactory,
             onReauth: async () => {
               try {
-                const refreshed = await fetchBootstrap("", bootstrapSecretRef.current);
+                const { email: e, password: p } = authCredsRef.current;
+                const refreshed = await fetchAuthLogin(e, p);
                 const refreshedUrl = deriveWsUrl(
                   refreshed.ws_path,
                   refreshed.token,
@@ -371,7 +443,6 @@ export default function App() {
               }
             },
           });
-          bootstrapSecretRef.current = secret;
           client.connect();
           setState({
             status: "ready",
@@ -384,11 +455,88 @@ export default function App() {
         } catch (e) {
           if (cancelled) return;
           const msg = (e as Error).message;
-          if (msg.includes("HTTP 401") || msg.includes("HTTP 403")) {
-            setState({ status: "auth", failed: true });
-          } else {
-            setState({ status: "error", message: msg });
-          }
+          setState({ status: "auth" });
+          setAuthError(msg);
+        }
+      })();
+      return () => {
+        cancelled = true;
+      };
+    },
+    [],
+  );
+
+  const bootstrapWithSignup = useCallback(
+    (name: string, email: string, password: string) => {
+      let cancelled = false;
+      (async () => {
+        setState({ status: "loading" });
+        setAuthError(null);
+        try {
+          const boot = await fetchAuthSignup(name, email, password);
+          if (cancelled) return;
+          saveEmail(email);
+          saveSessionPassword(password);
+          authCredsRef.current = { email, password };
+          const url = deriveWsUrl(boot.ws_path, boot.token, boot.ws_url);
+          const runtimeSurface = toRuntimeSurface(boot.runtime_surface);
+          const runtimeHost = createRuntimeHost(runtimeSurface, boot.runtime_capabilities);
+          const client = new NanobotClient({
+            url,
+            socketFactory: runtimeHost.socketFactory,
+            onReauth: async () => {
+              try {
+                const { email: e, password: p } = authCredsRef.current;
+                const refreshed = await fetchAuthLogin(e, p);
+                const refreshedUrl = deriveWsUrl(
+                  refreshed.ws_path,
+                  refreshed.token,
+                  refreshed.ws_url,
+                );
+                const refreshedSurface = refreshed.runtime_surface
+                  ? toRuntimeSurface(refreshed.runtime_surface)
+                  : runtimeSurface;
+                const refreshedHost = createRuntimeHost(
+                  refreshedSurface,
+                  refreshed.runtime_capabilities,
+                );
+                const tokenExpiresAt = bootstrapTokenExpiresAt(refreshed.expires_in);
+                if (refreshedHost.socketFactory) {
+                  client.updateUrl(refreshedUrl, refreshedHost.socketFactory);
+                } else {
+                  client.updateUrl(refreshedUrl);
+                }
+                setState((current) =>
+                  current.status === "ready" && current.client === client
+                    ? {
+                        ...current,
+                        token: refreshed.token,
+                        tokenExpiresAt,
+                        modelName: refreshed.model_name ?? current.modelName,
+                        runtimeSurface: refreshedSurface,
+                      }
+                    : current,
+                );
+                return refreshedUrl;
+              } catch {
+                return null;
+              }
+            },
+          });
+          client.connect();
+          setState({
+            status: "ready",
+            client,
+            token: boot.token,
+            tokenExpiresAt: bootstrapTokenExpiresAt(boot.expires_in),
+            modelName: boot.model_name ?? null,
+            runtimeSurface,
+          });
+        } catch (e) {
+          if (cancelled) return;
+          const msg = (e as Error).message;
+          setState({ status: "auth" });
+          setAuthError(msg);
         }
       })();
       return () => {
@@ -403,7 +551,8 @@ export default function App() {
     const client = state.client;
     const timer = window.setTimeout(async () => {
       try {
-        const boot = await fetchBootstrap("", bootstrapSecretRef.current);
+        const { email, password } = authCredsRef.current;
+        const boot = await fetchAuthLogin(email, password);
         const url = deriveWsUrl(boot.ws_path, boot.token, boot.ws_url);
         const runtimeSurface = boot.runtime_surface
           ? toRuntimeSurface(boot.runtime_surface)
@@ -426,20 +575,22 @@ export default function App() {
               }
             : current,
         );
-      } catch (e) {
-        const msg = (e as Error).message;
-        if (msg.includes("HTTP 401") || msg.includes("HTTP 403")) {
-          setState({ status: "auth", failed: true });
-        }
+      } catch {
+        setState({ status: "auth" });
       }
     }, tokenRefreshDelayMs(state.tokenExpiresAt));
     return () => window.clearTimeout(timer);
   }, [state]);
 
   useEffect(() => {
-    const saved = loadSavedSecret();
-    return bootstrapWithSecret(saved);
-  }, [bootstrapWithSecret]);
+    const email = loadSavedEmail();
+    const password = loadSessionPassword();
+    if (email && password) {
+      return bootstrapWithCredentials(email, password);
+    }
+    setState({ status: "auth" });
+    return undefined;
+  }, [bootstrapWithCredentials]);
 
   if (state.status === "loading") {
     return (
@@ -458,9 +609,10 @@ export default function App() {
   }
   if (state.status === "auth") {
     return (
-      <AuthForm
-        failed={!!state.failed}
-        onSecret={(s) => bootstrapWithSecret(s)}
+      <LoginSignupForm
+        errorMsg={authError}
+        onLogin={(email, password) => bootstrapWithCredentials(email, password)}
+        onSignup={(name, email, password) => bootstrapWithSignup(name, email, password)}
       />
     );
   }
@@ -488,7 +640,9 @@ export default function App() {
     if (state.status === "ready") {
       state.client.close();
     }
-    clearSavedSecret();
+    clearAuthSession();
+    authCredsRef.current = { email: "", password: "" };
+    setAuthError(null);
     setState({ status: "auth" });
   };
 
