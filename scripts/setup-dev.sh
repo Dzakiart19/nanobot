@@ -57,6 +57,11 @@ ws["port"]    = 8081
 ws["path"]    = "/ws"
 ws["tokenIssueSecret"] = password
 
+img = config.setdefault("tools", {}).setdefault("image_generation", {})
+img["enabled"]  = True
+img["provider"] = "custom"
+img["model"]    = "dall-e-3"
+
 with open(config_file, "w") as f:
     json.dump(config, f, indent=2)
 
