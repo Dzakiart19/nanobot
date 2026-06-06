@@ -93,3 +93,6 @@ SSL_CERT_FILE = "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages
 REQUESTS_CA_BUNDLE = "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/certifi/cacert.pem"
 DZECK_API_BASE = "https://chat-gateway--tmi84kzh.replit.app/v1"
 DZECK_MODEL = "qwen3.7-max"
+DZECK_API_KEY = "sk-dzcxELP19ZTLGJXKoo_8MiLpFn8iM8VTpim86l57KQFJ8tt6"
+OPENAI_API_KEY = "sk-dzcxELP19ZTLGJXKoo_8MiLpFn8iM8VTpim86l57KQFJ8tt6"
+MONGODB_URI = "mongodb+srv://galerizaki_db_user:wTkfzrqewY5qCxYG@cluster0.vmiek8b.mongodb.net/manus?retryWrites=true&w=majority"
