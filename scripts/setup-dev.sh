@@ -3,16 +3,16 @@ set -e
 
 # Install Python package if nanobot command not found
 if ! command -v nanobot &> /dev/null; then
-    echo "Installing nanobot Python package..."
+    echo "Installing Dzeck engine (nanobot package)..."
     pip install -e . -q
 fi
 
-# Create nanobot config if it doesn't exist
+# Create Dzeck config if it doesn't exist
 CONFIG_DIR="${HOME}/.nanobot"
 CONFIG_FILE="${CONFIG_DIR}/config.json"
 
 if [ ! -f "$CONFIG_FILE" ]; then
-    echo "Creating nanobot config..."
+    echo "Creating Dzeck config..."
     mkdir -p "$CONFIG_DIR"
     python3 - <<'PYEOF'
 import json, os, secrets

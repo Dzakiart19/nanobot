@@ -3,14 +3,14 @@ set -e
 
 echo ""
 echo "╔══════════════════════════════════════════╗"
-echo "║        🐈 nanobot installer               ║"
+echo "║        🐈 Dzeck installer                 ║"
 echo "╚══════════════════════════════════════════╝"
 echo ""
 
 # ── 1. Python package ────────────────────────────────────────────────────────
-echo "▶ [1/4] Installing Python package (nanobot)..."
+echo "▶ [1/4] Installing Python package (Dzeck engine)..."
 pip install -e . -q
-echo "    ✓ nanobot installed"
+echo "    ✓ Dzeck engine installed"
 
 # ── 2. Frontend dependencies ─────────────────────────────────────────────────
 echo "▶ [2/4] Installing frontend dependencies (webui)..."
@@ -23,7 +23,7 @@ npm install -q
 echo "    ✓ root dependencies installed"
 
 # ── 4. Create nanobot config ──────────────────────────────────────────────────
-echo "▶ [4/4] Setting up nanobot config (~/.nanobot/config.json)..."
+echo "▶ [4/4] Setting up Dzeck config (~/.nanobot/config.json)..."
 CONFIG_DIR="${HOME}/.nanobot"
 CONFIG_FILE="${CONFIG_DIR}/config.json"
 mkdir -p "$CONFIG_DIR"
@@ -71,7 +71,7 @@ PYEOF
 # ── Done ──────────────────────────────────────────────────────────────────────
 echo ""
 echo "╔══════════════════════════════════════════╗"
-echo "║  ✅ Installation complete!                ║"
+echo "║  ✅ Dzeck siap dijalankan!                ║"
 echo "║                                          ║"
 echo "║  Jalankan project:                       ║"
 echo "║    Backend : nanobot gateway --port 8080 ║"
