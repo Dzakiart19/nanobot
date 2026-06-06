@@ -54,12 +54,12 @@ waitForPort = 8080
 name = "e2e-send-message"
 author = "agent"
 
-[workflows.workflow.metadata]
-isValidation = true
-
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "node e2e/test-send-message.js"
+args = "NODE_PATH=node_modules NANOBOT_AUTH_SECRET=$(python3 -c \"import json; c=json.load(open('/root/.nanobot/config.json') if __import__('os').path.exists('/root/.nanobot/config.json') else open('/home/runner/.nanobot/config.json')); print(c['channels']['websocket']['tokenIssueSecret'])\") node e2e/test-send-message.js"
+
+[workflows.workflow.metadata]
+outputType = "console"
 
 [[ports]]
 localPort = 5000
@@ -74,6 +74,10 @@ exposeLocalhost = true
 localPort = 8080
 externalPort = 8080
 exposeLocalhost = true
+
+[[ports]]
+localPort = 8081
+externalPort = 8081
 
 [deployment]
 deploymentTarget = "vm"

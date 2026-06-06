@@ -5,7 +5,6 @@ import path from "node:path";
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const target = env.NANOBOT_API_URL ?? "http://127.0.0.1:8081";
-  const hmrPath = "/__nanobot_vite_hmr";
 
   return {
     plugins: [react()],
@@ -57,10 +56,13 @@ export default defineConfig(({ mode }) => {
       port: 5000,
       strictPort: true,
       allowedHosts: true,
-      hmr: {
-        clientPort: 443,
-        path: hmrPath,
-      },
+      hmr: process.env.REPLIT_DEV_DOMAIN
+        ? {
+            host: process.env.REPLIT_DEV_DOMAIN,
+            clientPort: 443,
+            protocol: "wss",
+          }
+        : true,
       proxy: {
         "/webui": { target, changeOrigin: true, ws: true },
         "/api": { target, changeOrigin: true },
