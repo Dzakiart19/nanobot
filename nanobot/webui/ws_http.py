@@ -415,6 +415,9 @@ class GatewayHTTPHandler:
             return self._handle_webui_sidebar_state(request)
         if got == "/api/webui/sidebar-state/update":
             return self._handle_webui_sidebar_state_update(request)
+        m = re.match(r"^/webui/download/([A-Za-z0-9_-]+)$", got)
+        if m:
+            return self._handle_download(m.group(1))
         return None
 
     def _handle_commands(self, request: WsRequest) -> Response:
@@ -455,6 +458,25 @@ class GatewayHTTPHandler:
             self._log.exception("failed to write webui sidebar state")
             return _http_error(500, "failed to write sidebar state")
         return _http_json_response(state)
+
+    def _handle_download(self, token: str) -> Response:
+        from nanobot.webui.download_registry import get_download
+        entry = get_download(token)
+        if entry is None:
+            return _http_error(404, "Download link not found or expired")
+        try:
+            data = entry.path.read_bytes()
+        except Exception:
+            return _http_error(500, "Failed to read file")
+        safe_name = entry.filename.replace('"', "")
+        return _http_response(
+            data,
+            content_type=entry.content_type,
+            extra_headers=[
+                ("Content-Disposition", f'attachment; filename="{safe_name}"'),
+                ("Cache-Control", "no-cache, no-store"),
+            ],
+        )
 
     # -- Static file serving ------------------------------------------------
 

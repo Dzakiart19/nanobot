@@ -2,7 +2,7 @@ import { Children, isValidElement, useMemo, type ReactNode } from "react";
 import type { Components, Options as ReactMarkdownOptions } from "react-markdown";
 import ReactMarkdown from "react-markdown";
 import rehypeKatex from "rehype-katex";
-import { Check } from "lucide-react";
+import { Check, Download } from "lucide-react";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
@@ -405,6 +405,26 @@ export default function MarkdownTextRenderer({
         );
       },
       a({ href, children: markdownChildren, ...props }) {
+        if (href && /^\/webui\/download\/[A-Za-z0-9_-]+$/.test(href)) {
+          const label = typeof markdownChildren === "string"
+            ? markdownChildren
+            : "Download file";
+          return (
+            <a
+              href={href}
+              download
+              className={cn(
+                "not-prose inline-flex items-center gap-2 rounded-lg px-4 py-2 my-1",
+                "bg-primary text-primary-foreground font-medium text-sm no-underline",
+                "hover:bg-primary/90 transition-colors cursor-pointer",
+              )}
+              {...props}
+            >
+              <Download className="h-4 w-4 shrink-0" />
+              {label}
+            </a>
+          );
+        }
         return (
           <a
             href={href}

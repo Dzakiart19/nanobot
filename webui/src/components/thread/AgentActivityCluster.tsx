@@ -1005,7 +1005,10 @@ function shellCommandFromArgs(args: string): string {
 }
 
 function summarizeShellCommand(command: string): string {
-  const redacted = redactShellCommand(command.replace(/\r\n/g, "\n"));
+  const normalized = command.replace(/\r\n/g, "\n");
+  const readable = naturalizeCommand(normalized);
+  if (readable) return readable;
+  const redacted = redactShellCommand(normalized);
   const lines = redacted
     .split("\n")
     .map((line) => line.trim())
@@ -1013,11 +1016,62 @@ function summarizeShellCommand(command: string): string {
   const firstLine = compactShellPath(lines[0] || "command");
   const firstPreview = truncateMiddle(firstLine, 92);
   if (lines.length <= 1) return firstPreview;
-  return `${firstPreview} · script, ${lines.length} lines`;
+  return `${firstPreview} · ${lines.length} lines`;
+}
+
+function naturalizeCommand(command: string): string | null {
+  const stripped = command
+    .replace(/\r\n/g, "\n")
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l) => l && !l.startsWith("#"))
+    .join(" && ");
+
+  if (!stripped) return null;
+
+  if (/^export\s+PATH=/i.test(stripped) || /^export\s+\w+=.*&&\s*export\s+PATH=/i.test(stripped)) {
+    return "Setting up environment";
+  }
+  if (/^(export\s+\w+=\S+\s*)+$/.test(stripped) || /^export\s+\w+=/.test(stripped)) {
+    return "Configuring environment";
+  }
+
+  const installMatch = /(?:npm install|npm i|yarn add|pnpm (install|add)|pip install|pip3 install|apt(?:-get)? install|brew install)\s*(.*)/i.exec(stripped);
+  if (installMatch) {
+    const packages = (installMatch[2] || "").replace(/--[^\s]+/g, "").trim();
+    return packages ? `Installing ${truncateMiddle(packages, 48)}` : "Installing packages";
+  }
+
+  const npmRunMatch = /npm run\s+(\S+)/i.exec(stripped);
+  if (npmRunMatch) return `Running ${npmRunMatch[1]}`;
+
+  const buildMatch = /\b(tsc|next build|vite build|webpack|cargo build|go build|mvn package|gradle build)\b/i.exec(stripped);
+  if (buildMatch) return `Building (${buildMatch[1]})`;
+
+  const mkdirMatch = /^mkdir\s+(-p\s+)?(.+)$/.exec(stripped);
+  if (mkdirMatch) {
+    const dir = compactShellPath(mkdirMatch[2].trim());
+    return `Creating directory: ${truncateMiddle(dir, 48)}`;
+  }
+
+  if (/^which\s+/.test(stripped) || /^command\s+-v\s+/.test(stripped) || /^type\s+/.test(stripped)) {
+    return "Checking installed tools";
+  }
+
+  if (/^echo\s+/.test(stripped) && !/&&/.test(stripped)) {
+    return "Checking environment";
+  }
+
+  if (/\|?\s*head\s+-\d+/.test(stripped) || /\|?\s*tail\s+-\d+/.test(stripped)) {
+    return "Reading output";
+  }
+
+  return null;
 }
 
 function redactShellCommand(command: string): string {
   return command
+    .replace(/\/nix\/store\/[a-z0-9]+-/gi, "/nix/…/")
     .replace(/\b((?:[A-Z0-9_]*)(?:API[_-]?KEY|TOKEN|SECRET|PASSWORD|PASS|AUTH)(?:[A-Z0-9_]*))=(?:"[^"]*"|'[^']*'|[^\s]+)/gi, "$1=••••")
     .replace(/\b(Bearer)\s+[A-Za-z0-9._~+/=-]+/gi, "$1 ••••")
     .replace(/(--(?:api-?key|token|secret|password)(?:=|\s+))(?:"[^"]*"|'[^']*'|[^\s]+)/gi, "$1••••")
@@ -1026,7 +1080,9 @@ function redactShellCommand(command: string): string {
 
 function compactShellPath(value: string): string {
   return value
+    .replace(/\/nix\/store\/[a-z0-9]+-[^/\s]+/gi, "…")
     .replace(/\/Users\/[^/\s"']+/g, "~")
+    .replace(/\/home\/runner\/[^/\s"']+/g, "~")
     .replace(/\/private\/tmp\/[^\s"']+/g, "/tmp/…")
     .replace(/\/var\/folders\/[^\s"']+/g, "/var/folders/…");
 }
