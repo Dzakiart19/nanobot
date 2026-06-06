@@ -240,7 +240,7 @@ class ImageGenerationProvider(ABC):
             return await client.post(url, headers=headers, json=body)
         if self._client is not None:
             return await self._client.post(url, headers=headers, json=body)
-        async with httpx.AsyncClient(timeout=self.timeout) as c:
+        async with httpx.AsyncClient(timeout=self.timeout, verify=False) as c:
             return await c.post(url, headers=headers, json=body)
 
 

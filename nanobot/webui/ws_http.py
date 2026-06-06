@@ -212,10 +212,6 @@ class GatewayHTTPHandler:
         if response is not None:
             return response
 
-        # Image generation route
-        if got == "/api/generate-image":
-            return await self._handle_generate_image(request)
-
         # API 404 (never serve SPA for /api/ routes)
         if got.startswith("/api/"):
             return _http_error(404, "API route not found")
@@ -599,47 +595,6 @@ class GatewayHTTPHandler:
             self._log.exception("failed to write webui sidebar state")
             return _http_error(500, "failed to write sidebar state")
         return _http_json_response(state)
-
-    async def _handle_generate_image(self, request: WsRequest) -> Response:
-        """Generate an image via the configured custom provider."""
-        if not self.check_api_token(request):
-            return _http_error(401, "Unauthorized")
-        try:
-            import os
-            import httpx as _httpx
-            from nanobot.providers.image_generation import (
-                CustomImageGenerationClient,
-                ImageGenerationError,
-            )
-
-            body_bytes = getattr(request, "body", b"") or b""
-            try:
-                payload = json.loads(body_bytes) if body_bytes else {}
-            except json.JSONDecodeError:
-                payload = {}
-
-            query = _parse_query(request.path)
-            prompt = payload.get("prompt") or _query_first(query, "prompt") or ""
-            model = payload.get("model") or _query_first(query, "model") or "dall-e-3"
-
-            if not prompt:
-                return _http_json_response({"error": "prompt is required"}, status=400)
-
-            api_base = os.environ.get("NANOBOT_API_BASE", "").rstrip("/")
-            api_key = os.environ.get("NANOBOT_API_KEY", "")
-
-            async with _httpx.AsyncClient(verify=False, timeout=120.0) as http_client:
-                gen_client = CustomImageGenerationClient(
-                    api_key=api_key or None,
-                    api_base=api_base or None,
-                    client=http_client,
-                )
-                result = await gen_client.generate(prompt=prompt, model=model)
-
-            return _http_json_response({"images": result.images, "content": result.content})
-        except Exception as exc:
-            self._log.error("image generation failed: {}", exc)
-            return _http_json_response({"error": str(exc)}, status=500)
 
     def _handle_download(self, token: str) -> Response:
         from nanobot.webui.download_registry import get_download
