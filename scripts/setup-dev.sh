@@ -21,7 +21,7 @@ if ! command -v nanobot &> /dev/null; then
     fi
 fi
 
-# Always sync API key/base from env vars into config
+# Create config using ${VAR} references so env vars are always the source of truth
 CONFIG_DIR="${HOME}/.nanobot"
 CONFIG_FILE="${CONFIG_DIR}/config.json"
 mkdir -p "$CONFIG_DIR"
@@ -39,19 +39,16 @@ if os.path.exists(config_file):
 else:
     config = {}
 
-api_key  = os.environ.get("NANOBOT_API_KEY", "")
-api_base = os.environ.get("NANOBOT_API_BASE", "")
-model    = os.environ.get("NANOBOT_MODEL", "gpt-4o-mini")
 password = os.environ.get("NANOBOT_PASSWORD", "admin123")
 
-if api_key and api_base:
-    config.setdefault("providers", {})["custom"] = {
-        "type": "openai",
-        "apiKey": api_key,
-        "apiBase": api_base,
-    }
-    config.setdefault("agents", {}).setdefault("defaults", {})["provider"] = "custom"
-    config.setdefault("agents", {}).setdefault("defaults", {})["model"] = model
+# Always use ${VAR} references — values resolved at runtime from env vars
+config.setdefault("providers", {})["custom"] = {
+    "type": "openai",
+    "apiKey": "${NANOBOT_API_KEY}",
+    "apiBase": "${NANOBOT_API_BASE}",
+}
+config.setdefault("agents", {}).setdefault("defaults", {})["provider"] = "custom"
+config.setdefault("agents", {}).setdefault("defaults", {})["model"] = "${NANOBOT_MODEL}"
 
 ws = config.setdefault("channels", {}).setdefault("websocket", {})
 ws["enabled"] = True
@@ -63,5 +60,5 @@ ws["tokenIssueSecret"] = password
 with open(config_file, "w") as f:
     json.dump(config, f, indent=2)
 
-print(f"Config synced: model={model}, apiBase={api_base}, ws_port=8081")
+print("Config ready: apiKey=${NANOBOT_API_KEY}, apiBase=${NANOBOT_API_BASE}, model=${NANOBOT_MODEL}")
 PYEOF
