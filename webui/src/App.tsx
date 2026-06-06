@@ -204,7 +204,15 @@ function LoginSignupForm({
   return (
     <div className="flex h-full w-full items-center justify-center px-6">
       <div className="flex w-full max-w-sm flex-col gap-5">
-        <div className="flex flex-col items-center gap-1 text-center">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <div className="flex h-24 w-24 items-center justify-center rounded-2xl bg-black">
+            <img
+              src="/brand/dzeck_logo_transparent.png"
+              alt="Dzeck"
+              className="h-20 w-20 select-none object-contain"
+              draggable={false}
+            />
+          </div>
           <p className="text-2xl font-bold tracking-tight">Dzeck</p>
           <p className="text-sm text-muted-foreground">Your personal AI assistant</p>
         </div>
