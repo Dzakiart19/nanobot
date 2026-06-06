@@ -1,29 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
-# Install / verify all skill dependencies
+# Install all dependencies (Python package + skill tools)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-bash "$SCRIPT_DIR/install-deps.sh"
-
-# Remove stale non-editable dzeck install that overrides workspace source.
-# The editable .pth file (_editable_impl_dzeck_ai.pth) already points to
-# /home/runner/workspace, so a plain "dzeck" directory in site-packages
-# would shadow it and serve stale code.
-SITE_PKG="$HOME/workspace/.pythonlibs/lib/python3.11/site-packages"
-if [ -d "$SITE_PKG/dzeck" ]; then
-    echo "Removing stale dzeck install from site-packages..."
-    rm -rf "$SITE_PKG/dzeck"
-fi
-
-# Install Python package if dzeck command not found
-if ! command -v dzeck &> /dev/null; then
-    echo "Installing Dzeck engine (dzeck package)..."
-    pip install -e . -q
-    # After editable install, ensure no plain directory copy shadowed it
-    if [ -d "$SITE_PKG/dzeck" ]; then
-        rm -rf "$SITE_PKG/dzeck"
-    fi
-fi
+bash "$SCRIPT_DIR/install.sh"
 
 # Create config using ${VAR} references so env vars are always the source of truth
 CONFIG_DIR="${HOME}/.dzeck"
