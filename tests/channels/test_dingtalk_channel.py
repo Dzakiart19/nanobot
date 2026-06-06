@@ -18,7 +18,7 @@ if not DINGTALK_AVAILABLE:
 
 import dzeck.channels.dingtalk as dingtalk_module
 from dzeck.bus.queue import MessageBus
-from dzeck.channels.dingtalk import DingTalkChannel, DingTalkConfig, NanobotDingTalkHandler
+from dzeck.channels.dingtalk import DingTalkChannel, DingTalkConfig, DzeckDingTalkHandler
 
 
 class _FakeResponse:
@@ -157,7 +157,7 @@ async def test_group_send_uses_group_messages_api() -> None:
         "token",
         "group:conv123",
         "sampleMarkdown",
-        {"text": "hello", "title": "Nanobot Reply"},
+        {"text": "hello", "title": "Dzeck Reply"},
     )
 
     assert ok is True
@@ -174,7 +174,7 @@ async def test_handler_uses_voice_recognition_text_when_text_is_empty(monkeypatc
         DingTalkConfig(client_id="app", client_secret="secret", allow_from=["user1"]),
         bus,
     )
-    handler = NanobotDingTalkHandler(channel)
+    handler = DzeckDingTalkHandler(channel)
 
     class _FakeChatbotMessage:
         text = None
@@ -218,7 +218,7 @@ async def test_handler_processes_file_message(monkeypatch) -> None:
         DingTalkConfig(client_id="app", client_secret="secret", allow_from=["user1"]),
         bus,
     )
-    handler = NanobotDingTalkHandler(channel)
+    handler = DzeckDingTalkHandler(channel)
 
     class _FakeFileChatbotMessage:
         text = None
@@ -629,7 +629,7 @@ async def test_send_batch_message_propagates_transport_error() -> None:
             "token",
             "user123",
             "sampleMarkdown",
-            {"text": "hello", "title": "Nanobot Reply"},
+            {"text": "hello", "title": "Dzeck Reply"},
         )
 
     # The POST was attempted exactly once

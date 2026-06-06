@@ -7,11 +7,11 @@ Use Dzeck as a library — no CLI, no gateway, just Python.
 ```python
 import asyncio
 
-from Dzeck import Nanobot
+from dzeck import Dzeck
 
 
 async def main() -> None:
-    async with Nanobot.from_config() as bot:
+    async with Dzeck.from_config() as bot:
         result = await bot.run("What time is it in Tokyo?")
     print(result.content)
 
@@ -19,7 +19,7 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
-`Nanobot.from_config()` reuses your normal `~/.Dzeck/config.json`, so the SDK follows the same provider, model, tools, and workspace defaults as the CLI unless you override them.
+`Dzeck.from_config()` reuses your normal `~/.dzeck/config.json`, so the SDK follows the same provider, model, tools, and workspace defaults as the CLI unless you override them.
 
 Use `async with` when possible so MCP connections and background cleanup work are closed before the event loop exits. If you manage the instance manually, call `await bot.aclose()` in a `finally` block.
 
@@ -28,10 +28,10 @@ Use `async with` when possible so MCP connections and background cleanup work ar
 ### Use a specific config or workspace
 
 ```python
-from Dzeck import Nanobot
+from dzeck import Dzeck
 
-bot = Nanobot.from_config(
-    config_path="~/.Dzeck/config.json",
+bot = Dzeck.from_config(
+    config_path="~/.dzeck/config.json",
     workspace="/my/project",
 )
 ```
@@ -64,13 +64,13 @@ result = await bot.run("Review this change", hooks=[AuditHook()])
 
 ## API Reference
 
-### `Nanobot.from_config(config_path=None, *, workspace=None)`
+### `Dzeck.from_config(config_path=None, *, workspace=None)`
 
-Create a `Nanobot` instance from a config file.
+Create a `Dzeck` instance from a config file.
 
 | Param | Type | Default | Description |
 |-------|------|---------|-------------|
-| `config_path` | `str \| Path \| None` | `None` | Path to `config.json`. Defaults to `~/.Dzeck/config.json`. |
+| `config_path` | `str \| Path \| None` | `None` | Path to `config.json`. Defaults to `~/.dzeck/config.json`. |
 | `workspace` | `str \| Path \| None` | `None` | Override the workspace directory from config. |
 
 Raises `FileNotFoundError` if an explicit config path does not exist.
@@ -90,7 +90,7 @@ Run the agent once and return a `RunResult`.
 Release resources held by the SDK instance, including MCP connections. The async context manager calls this automatically:
 
 ```python
-async with Nanobot.from_config() as bot:
+async with Dzeck.from_config() as bot:
     result = await bot.run("Summarize this repo")
 ```
 
@@ -199,7 +199,7 @@ class Censor(AgentHook):
 import asyncio
 import time
 
-from Dzeck import Nanobot
+from dzeck import Dzeck
 from Dzeck.agent import AgentHook, AgentHookContext
 
 
@@ -217,7 +217,7 @@ class TimingHook(AgentHook):
 
 
 async def main() -> None:
-    bot = Nanobot.from_config(workspace="/my/project")
+    bot = Dzeck.from_config(workspace="/my/project")
     result = await bot.run(
         "Explain the main function",
         session_key="sdk:demo",

@@ -48,7 +48,7 @@ from rich.markdown import Markdown  # noqa: E402
 from rich.table import Table  # noqa: E402
 from rich.text import Text  # noqa: E402
 
-from Dzeck import __logo__, __version__  # noqa: E402
+from dzeck import __logo__, __version__  # noqa: E402
 from dzeck.agent.loop import AgentLoop  # noqa: E402
 from dzeck.cli.stream import StreamRenderer, ThinkingSpinner  # noqa: E402
 from dzeck.config.paths import get_workspace_path, is_default_workspace  # noqa: E402
@@ -747,7 +747,7 @@ def _load_or_create_desktop_config(config: str | None, workspace: str | None) ->
         save_config,
         set_config_path,
     )
-    from dzeck.config.schema import Config as NanobotConfig
+    from dzeck.config.schema import Config as DzeckConfig
 
     config_path = Path(config).expanduser().resolve() if config else get_config_path()
     set_config_path(config_path)
@@ -759,7 +759,7 @@ def _load_or_create_desktop_config(config: str | None, workspace: str | None) ->
             console.print(f"[red]Error: {e}[/red]")
             raise typer.Exit(1)
     else:
-        loaded = NanobotConfig()
+        loaded = DzeckConfig()
         created = True
 
     if workspace:

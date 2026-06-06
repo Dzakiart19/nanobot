@@ -37,7 +37,7 @@ from dzeck.webui.settings_api import (
 
 QueryParams = dict[str, list[str]]
 
-_MCP_VALUES_HEADER = "X-Nanobot-MCP-Values"
+_MCP_VALUES_HEADER = "X-Dzeck-MCP-Values"
 _MCP_VALUES_HEADER_MAX_BYTES = 64 * 1024
 
 _MCP_PRESET_ACTIONS_BY_PATH = {

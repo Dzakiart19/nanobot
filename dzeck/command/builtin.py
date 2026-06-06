@@ -9,7 +9,7 @@ import time
 from contextlib import suppress
 from dataclasses import dataclass
 
-from Dzeck import __version__
+from dzeck import __version__
 from dzeck.bus.events import OutboundMessage
 from dzeck.command.router import CommandContext, CommandRouter
 from dzeck.utils.helpers import build_status_content

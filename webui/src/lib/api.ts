@@ -78,7 +78,7 @@ function mcpValuesHeader(values: Record<string, unknown>): HeadersInit | undefin
     payload[key] = value;
   });
   if (!Object.keys(payload).length) return undefined;
-  return { "X-Nanobot-MCP-Values": JSON.stringify(payload) };
+  return { "X-Dzeck-MCP-Values": JSON.stringify(payload) };
 }
 
 function splitKey(key: string): { channel: string; chatId: string } {

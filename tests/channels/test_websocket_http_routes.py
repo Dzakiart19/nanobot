@@ -325,7 +325,7 @@ async def test_mcp_presets_routes_require_token_and_return_payload(
             "http://127.0.0.1:29913/api/settings/mcp-presets/enable?name=browserbase",
             headers={
                 **auth,
-                "X-Nanobot-MCP-Values": json.dumps(
+                "X-Dzeck-MCP-Values": json.dumps(
                     {"browserbase_api_key": "bb_live_secret"}
                 ),
             },
@@ -340,7 +340,7 @@ async def test_mcp_presets_routes_require_token_and_return_payload(
 
         bad_header = await _http_get(
             "http://127.0.0.1:29913/api/settings/mcp-presets/enable?name=browserbase",
-            headers={**auth, "X-Nanobot-MCP-Values": "[]"},
+            headers={**auth, "X-Dzeck-MCP-Values": "[]"},
         )
         assert bad_header.status_code == 400
 
@@ -348,7 +348,7 @@ async def test_mcp_presets_routes_require_token_and_return_payload(
             "http://127.0.0.1:29913/api/settings/mcp-presets/custom",
             headers={
                 **auth,
-                "X-Nanobot-MCP-Values": json.dumps(
+                "X-Dzeck-MCP-Values": json.dumps(
                     {"name": "docs", "command": "npx"}
                 ),
             },
@@ -359,7 +359,7 @@ async def test_mcp_presets_routes_require_token_and_return_payload(
 
         imported = await _http_get(
             "http://127.0.0.1:29913/api/settings/mcp-presets/import",
-            headers={**auth, "X-Nanobot-MCP-Values": json.dumps({"config": "{}"})},
+            headers={**auth, "X-Dzeck-MCP-Values": json.dumps({"config": "{}"})},
         )
         assert imported.status_code == 200
         assert imported.json()["last_action"]["message"] == "import:config MCP config reloaded."
@@ -368,7 +368,7 @@ async def test_mcp_presets_routes_require_token_and_return_payload(
             "http://127.0.0.1:29913/api/settings/mcp-presets/tools",
             headers={
                 **auth,
-                "X-Nanobot-MCP-Values": json.dumps(
+                "X-Dzeck-MCP-Values": json.dumps(
                     {"name": "docs", "enabled_tools": []}
                 ),
             },

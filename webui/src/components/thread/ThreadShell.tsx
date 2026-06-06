@@ -5,7 +5,7 @@ import { ThreadComposer } from "@/components/thread/ThreadComposer";
 import { ThreadHeader } from "@/components/thread/ThreadHeader";
 import { StreamErrorNotice } from "@/components/thread/StreamErrorNotice";
 import { ThreadViewport } from "@/components/thread/ThreadViewport";
-import { useNanobotStream, type SendImage, type SendOptions } from "@/hooks/useNanobotStream";
+import { useDzeckStream, type SendImage, type SendOptions } from "@/hooks/useDzeckStream";
 import { useSessionHistory } from "@/hooks/useSessions";
 import { fetchCliApps, fetchMcpPresets, fetchSettings, listSlashCommands } from "@/lib/api";
 import {
@@ -198,7 +198,7 @@ export function ThreadShell({
     setMessages,
     streamError,
     dismissStreamError,
-  } = useNanobotStream(chatId, initial, hasPendingToolCalls, handleTurnEnd);
+  } = useDzeckStream(chatId, initial, hasPendingToolCalls, handleTurnEnd);
 
   useEffect(() => {
     if (chatId && historyKey) sessionKeyByChatIdRef.current.set(chatId, historyKey);
@@ -330,7 +330,7 @@ export function ThreadShell({
     }
   }, [chatId, messages]);
 
-  // Persist thread to in-memory cache after paint so ``useNanobotStream``'s chat switch
+  // Persist thread to in-memory cache after paint so ``useDzeckStream``'s chat switch
   // ``useEffect`` reset has flushed; ``skipLayoutCacheRef`` drops the first run that still
   // sees the *previous* chat's ``messages`` (avoids stale rows leaking across sessions).
   useEffect(() => {

@@ -313,7 +313,7 @@ describe("webui API helpers", () => {
       expect.objectContaining({
         headers: expect.objectContaining({
           Authorization: "Bearer tok",
-          "X-Nanobot-MCP-Values": JSON.stringify({
+          "X-Dzeck-MCP-Values": JSON.stringify({
             browserbase_api_key: "bb_live_test",
           }),
         }),
@@ -334,7 +334,7 @@ describe("webui API helpers", () => {
       expect.objectContaining({
         headers: expect.objectContaining({
           Authorization: "Bearer tok",
-          "X-Nanobot-MCP-Values": JSON.stringify({
+          "X-Dzeck-MCP-Values": JSON.stringify({
             name: "docs",
             transport: "stdio",
             command: "npx",
@@ -351,7 +351,7 @@ describe("webui API helpers", () => {
       expect.objectContaining({
         headers: expect.objectContaining({
           Authorization: "Bearer tok",
-          "X-Nanobot-MCP-Values": JSON.stringify({
+          "X-Dzeck-MCP-Values": JSON.stringify({
             config: '{"mcpServers":{"docs":{"command":"npx"}}}',
           }),
         }),
@@ -364,7 +364,7 @@ describe("webui API helpers", () => {
       expect.objectContaining({
         headers: expect.objectContaining({
           Authorization: "Bearer tok",
-          "X-Nanobot-MCP-Values": JSON.stringify({
+          "X-Dzeck-MCP-Values": JSON.stringify({
             name: "docs",
             enabled_tools: ["search", "fetch"],
           }),

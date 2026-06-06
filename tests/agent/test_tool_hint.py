@@ -302,7 +302,7 @@ class TestToolHintMaxLength:
 
     def test_list_dir_path_respects_max_length(self):
         """list_dir (is_path=True) should honor max_length."""
-        long_path = "/home/user/.local/share/uv/tools/nanobot/"
+        long_path = "/home/user/.local/share/uv/tools/dzeck/"
         short = _hint([_tc("list_dir", {"path": long_path})], max_length=40)
         long = _hint([_tc("list_dir", {"path": long_path})], max_length=120)
         assert len(long) > len(short)

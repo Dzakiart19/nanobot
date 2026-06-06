@@ -1,6 +1,6 @@
 # WebSocket Server Channel
 
-Nanobot can act as a WebSocket server, allowing external clients (web apps, CLIs, scripts) to interact with the agent in real time via persistent connections.
+Dzeck can act as a WebSocket server, allowing external clients (web apps, CLIs, scripts) to interact with the agent in real time via persistent connections.
 
 ## Features
 
@@ -255,7 +255,7 @@ For production deployments where `websocketRequiresToken: true`, use short-lived
 
 ### How it works
 
-1. Client sends `GET {tokenIssuePath}` with `Authorization: Bearer {tokenIssueSecret}` (or `X-Nanobot-Auth` header).
+1. Client sends `GET {tokenIssuePath}` with `Authorization: Bearer {tokenIssueSecret}` (or `X-Dzeck-Auth` header).
 2. Server responds with a one-time-use token:
 
 ```json

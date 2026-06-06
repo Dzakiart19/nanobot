@@ -89,7 +89,7 @@ which Dzeck   # e.g. /home/user/.local/bin/Dzeck
 
 ```ini
 [Unit]
-Description=Nanobot Gateway
+Description=Dzeck Gateway
 After=network.target
 
 [Service]

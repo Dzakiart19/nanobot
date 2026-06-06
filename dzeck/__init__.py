@@ -29,7 +29,7 @@ __version__ = _resolve_version()
 __logo__ = "🐈"
 
 _LAZY_EXPORTS = {
-    "Nanobot": ".dzeck",
+    "Dzeck": ".dzeck",
     "RunResult": ".dzeck",
 }
 
@@ -45,4 +45,4 @@ def __getattr__(name: str):
     return val
 
 
-__all__ = ["Nanobot", "RunResult"]
+__all__ = ["Dzeck", "RunResult"]

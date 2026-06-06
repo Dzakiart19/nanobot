@@ -196,7 +196,7 @@ def _extract_tc_extras(tc: Any) -> tuple[
 
 
 def _uses_openrouter_attribution(spec: "ProviderSpec | None", api_base: str | None) -> bool:
-    """Apply Nanobot attribution headers to OpenRouter requests by default."""
+    """Apply Dzeck attribution headers to OpenRouter requests by default."""
     if spec and spec.name == "openrouter":
         return True
     return bool(api_base and "openrouter" in api_base.lower())

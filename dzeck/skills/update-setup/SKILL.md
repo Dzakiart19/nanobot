@@ -109,7 +109,7 @@ name: update
 description: "Upgrade Dzeck to the latest version. Triggers: upgrade Dzeck, update Dzeck, 升级Dzeck, 更新Dzeck."
 ---
 
-# Update Nanobot
+# Update Dzeck
 
 1. (If proxy configured) Set proxy: `export http_proxy=URL && export https_proxy=URL`
 2. Use `exec` to run the preflight check: <PREFLIGHT_CHECK>. If it fails, stop and tell the user to rerun `update-setup` because the saved install method no longer matches this environment.

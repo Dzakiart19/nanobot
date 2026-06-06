@@ -43,10 +43,10 @@ except ImportError:
     ChatbotMessage = None  # type: ignore[assignment,misc]
 
 
-class NanobotDingTalkHandler(CallbackHandler):
+class DzeckDingTalkHandler(CallbackHandler):
     """
     Standard DingTalk Stream SDK Callback Handler.
-    Parses incoming messages and forwards them to the Nanobot channel.
+    Parses incoming messages and forwards them to the Dzeck channel.
     """
 
     def __init__(self, channel: "DingTalkChannel"):
@@ -129,7 +129,7 @@ class NanobotDingTalkHandler(CallbackHandler):
 
             self.channel.logger.info("Received message from {} ({}): {}", sender_name, sender_id, content)
 
-            # Forward to Nanobot via _on_message (non-blocking).
+            # Forward to Dzeck via _on_message (non-blocking).
             # Store reference to prevent GC before task completes.
             task = asyncio.create_task(
                 self.channel._on_message(
@@ -224,7 +224,7 @@ class DingTalkChannel(BaseChannel):
             self._client = DingTalkStreamClient(credential)
 
             # Register standard handler
-            handler = NanobotDingTalkHandler(self)
+            handler = DzeckDingTalkHandler(self)
             self._client.register_callback_handler(ChatbotMessage.TOPIC, handler)
 
             self.logger.info("bot started with Stream Mode")
@@ -592,7 +592,7 @@ class DingTalkChannel(BaseChannel):
             token,
             chat_id,
             "sampleMarkdown",
-            {"text": content, "title": "Nanobot Reply"},
+            {"text": content, "title": "Dzeck Reply"},
         )
 
     async def _send_media_ref(self, token: str, chat_id: str, media_ref: str) -> bool:
@@ -685,7 +685,7 @@ class DingTalkChannel(BaseChannel):
         conversation_type: str | None = None,
         conversation_id: str | None = None,
     ) -> None:
-        """Handle incoming message (called by NanobotDingTalkHandler).
+        """Handle incoming message (called by DzeckDingTalkHandler).
 
         Delegates to BaseChannel._handle_message() which enforces allow_from
         permission checks before publishing to the bus.

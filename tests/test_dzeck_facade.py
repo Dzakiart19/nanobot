@@ -1,4 +1,4 @@
-"""Tests for the Nanobot programmatic facade."""
+"""Tests for the Dzeck programmatic facade."""
 
 from __future__ import annotations
 

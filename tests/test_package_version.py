@@ -20,7 +20,7 @@ def test_source_checkout_import_uses_pyproject_version_without_metadata() -> Non
 
         sys.path.insert(0, {str(repo_root)!r})
         fake = types.ModuleType("dzeck.dzeck")
-        fake.Nanobot = object
+        fake.Dzeck = object
         fake.RunResult = object
         sys.modules["dzeck.dzeck"] = fake
 
