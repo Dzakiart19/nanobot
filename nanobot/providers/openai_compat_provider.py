@@ -367,7 +367,7 @@ class OpenAICompatProvider(LLMProvider):
         import httpx
 
         timeout_s = _openai_compat_timeout_s()
-        http_client: httpx.AsyncClient | None = None
+
         if self._is_local:
             # Local model servers (Ollama, llama.cpp, vLLM) often close idle
             # HTTP connections before the client-side keepalive expires. When
@@ -381,6 +381,12 @@ class OpenAICompatProvider(LLMProvider):
             http_client = httpx.AsyncClient(
                 limits=httpx.Limits(keepalive_expiry=0),
                 timeout=timeout_s,
+                verify=False,
+            )
+        else:
+            http_client = httpx.AsyncClient(
+                timeout=timeout_s,
+                verify=False,
             )
         self._client = AsyncOpenAI(
             api_key=self._api_key_for_client,
