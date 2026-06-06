@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { ImageGenDialog } from "@/components/ImageGenDialog";
 import { ThreadComposer } from "@/components/thread/ThreadComposer";
 import { ThreadHeader } from "@/components/thread/ThreadHeader";
 import { StreamErrorNotice } from "@/components/thread/StreamErrorNotice";
@@ -169,6 +170,7 @@ export function ThreadShell({
   const [cliApps, setCliApps] = useState<CliAppInfo[]>([]);
   const [mcpPresets, setMcpPresets] = useState<McpPresetInfo[]>([]);
   const [settings, setSettings] = useState<SettingsPayload | null>(settingsSnapshot);
+  const [imageGenOpen, setImageGenOpen] = useState(false);
   const [heroGreetingKey, setHeroGreetingKey] = useState(randomHeroGreetingKey);
   const [scrollToBottomSignal, setScrollToBottomSignal] = useState(0);
   const pendingFirstRef = useRef<PendingFirstMessage | null>(null);
@@ -460,6 +462,36 @@ export function ThreadShell({
     };
   }, [refreshMcpPresets, token]);
 
+  const handleImageGenSuccess = useCallback(
+    (images: string[], prompt: string) => {
+      setScrollToBottomSignal((v) => v + 1);
+      const now = Date.now();
+      const userMsg: UIMessage = {
+        id: `imggen-user-${now}`,
+        role: "user",
+        content: `Generate image: ${prompt}`,
+        createdAt: now,
+      };
+      const assistantMsg: UIMessage = {
+        id: `imggen-asst-${now}`,
+        role: "assistant",
+        content: "",
+        createdAt: now + 1,
+        media: images.map((url, i) => ({
+          kind: "image" as const,
+          url,
+          name: `generated-${i + 1}.png`,
+        })),
+      };
+      setMessages((prev) => [...prev, userMsg, assistantMsg]);
+    },
+    [setMessages, setScrollToBottomSignal],
+  );
+
+  const handleImageGen = useCallback(() => {
+    setImageGenOpen(true);
+  }, []);
+
   const handleWelcomeSend = useCallback(
     async (content: string, images?: SendImage[], options?: SendOptions) => {
       if (booting) return;
@@ -517,6 +549,7 @@ export function ThreadShell({
           workspaceError={workspaceError}
           onWorkspaceScopeChange={onWorkspaceScopeChange}
           pendingQueueKey={chatId}
+          onImageGen={handleImageGen}
         />
       ) : (
         <ThreadComposer
@@ -543,6 +576,7 @@ export function ThreadShell({
           workspaceScopeDisabled={workspaceScopeDisabled}
           workspaceError={workspaceError}
           onWorkspaceScopeChange={onWorkspaceScopeChange}
+          onImageGen={handleImageGen}
         />
       )}
     </>
@@ -562,6 +596,12 @@ export function ThreadShell({
 
   return (
     <section className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
+      <ImageGenDialog
+        open={imageGenOpen}
+        token={token}
+        onOpenChange={setImageGenOpen}
+        onSuccess={handleImageGenSuccess}
+      />
       {!hideHeader ? (
         <ThreadHeader
           title={title}

@@ -110,6 +110,8 @@ interface ThreadComposerProps {
   workspaceError?: string | null;
   onWorkspaceScopeChange?: (scope: WorkspaceScopePayload) => void;
   pendingQueueKey?: string | null;
+  /** Opens the image generation dialog. */
+  onImageGen?: () => void;
 }
 
 const COMMAND_ICONS: Record<string, LucideIcon> = {
@@ -661,6 +663,7 @@ export function ThreadComposer({
   workspaceError = null,
   onWorkspaceScopeChange,
   pendingQueueKey = null,
+  onImageGen,
 }: ThreadComposerProps) {
   const { t } = useTranslation();
   const [value, setValue] = useState("");
@@ -1517,6 +1520,24 @@ export function ThreadComposer({
             >
               <Plus className={cn(isHero ? "h-[18px] w-[18px]" : "h-4 w-4")} />
             </Button>
+            {onImageGen ? (
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                disabled={disabled}
+                aria-label="Generate image"
+                onClick={onImageGen}
+                className={cn(
+                  "rounded-full text-muted-foreground hover:text-foreground",
+                  isHero
+                    ? "h-8 w-8 border border-border/55 bg-card shadow-[0_2px_8px_rgba(15,23,42,0.05)] hover:bg-card"
+                    : "h-9 w-9 border border-border/55 bg-card shadow-[0_2px_8px_rgba(15,23,42,0.05)] hover:bg-card",
+                )}
+              >
+                <ImageIcon className={cn(isHero ? "h-[18px] w-[18px]" : "h-4 w-4")} />
+              </Button>
+            ) : null}
             {workspaceScope ? (
               <WorkspaceAccessMenu
                 scope={workspaceScope}

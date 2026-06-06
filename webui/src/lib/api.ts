@@ -460,6 +460,23 @@ export async function updateNetworkSafetySettings(
   );
 }
 
+export async function generateImage(
+  token: string,
+  prompt: string,
+  model?: string,
+): Promise<{ images: string[]; content: string }> {
+  return request<{ images: string[]; content: string }>(
+    "/api/generate-image",
+    token,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt, model: model || "dall-e-3" }),
+    },
+    120_000,
+  );
+}
+
 export async function updateImageGenerationSettings(
   token: string,
   update: ImageGenerationSettingsUpdate,
