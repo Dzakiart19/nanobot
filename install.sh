@@ -7,23 +7,36 @@ echo "║        🐈 Dzeck installer                 ║"
 echo "╚══════════════════════════════════════════╝"
 echo ""
 
-# ── 1. Python package ────────────────────────────────────────────────────────
-echo "▶ [1/4] Installing Python package (Dzeck engine)..."
+# ── 1. Python package (core dependencies dari pyproject.toml) ─────────────────
+echo "▶ [1/6] Installing Python package (Dzeck engine)..."
 pip install -e . -q
 echo "    ✓ Dzeck engine installed"
 
-# ── 2. Frontend dependencies ─────────────────────────────────────────────────
-echo "▶ [2/4] Installing frontend dependencies (webui)..."
+# ── 2. Extra Python dependencies (tidak ada di pyproject.toml) ───────────────
+echo "▶ [2/6] Installing extra Python dependencies..."
+pip install -q \
+    pymongo \
+    discord.py \
+    aiohttp
+echo "    ✓ Extra Python dependencies installed"
+
+# ── 3. Optional Python extras ─────────────────────────────────────────────────
+echo "▶ [3/6] Installing optional Python extras (api, discord)..."
+pip install -q -e ".[api,discord]"
+echo "    ✓ Optional extras installed"
+
+# ── 4. Frontend dependencies ──────────────────────────────────────────────────
+echo "▶ [4/6] Installing frontend dependencies (webui)..."
 cd webui && npm install -q && cd ..
 echo "    ✓ webui dependencies installed"
 
-# ── 3. Root / e2e dependencies ───────────────────────────────────────────────
-echo "▶ [3/4] Installing root dependencies (e2e/ws)..."
+# ── 5. Root / e2e dependencies ────────────────────────────────────────────────
+echo "▶ [5/6] Installing root dependencies (e2e/ws/playwright)..."
 npm install -q
 echo "    ✓ root dependencies installed"
 
-# ── 4. Create nanobot config ──────────────────────────────────────────────────
-echo "▶ [4/4] Setting up Dzeck config (~/.nanobot/config.json)..."
+# ── 6. Create nanobot config ──────────────────────────────────────────────────
+echo "▶ [6/6] Setting up Dzeck config (~/.nanobot/config.json)..."
 CONFIG_DIR="${HOME}/.nanobot"
 CONFIG_FILE="${CONFIG_DIR}/config.json"
 mkdir -p "$CONFIG_DIR"
