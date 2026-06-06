@@ -18,32 +18,32 @@ cd webui && bun run build
 cd webui && bun run test
 
 # Gateway
-Dzeck gateway
+dzeck gateway
 ```
 
 ## High-Level Architecture
 
 ### Core Data Flow
 
-Messages flow through an async `MessageBus` (`Dzeck/bus/queue.py`) that decouples chat channels from the agent core:
+Messages flow through an async `MessageBus` (`dzeck/bus/queue.py`) that decouples chat channels from the agent core:
 
 1. **Channels** (`Dzeck/channels/`) receive messages from external platforms and publish `InboundMessage` events to the bus.
-2. **`AgentLoop`** (`Dzeck/agent/loop.py`) consumes inbound messages, builds context, and coordinates the turn.
-3. **`AgentRunner`** (`Dzeck/agent/runner.py`) handles the actual LLM conversation loop: send messages to the provider, receive tool calls, execute tools, and stream responses.
+2. **`AgentLoop`** (`dzeck/agent/loop.py`) consumes inbound messages, builds context, and coordinates the turn.
+3. **`AgentRunner`** (`dzeck/agent/runner.py`) handles the actual LLM conversation loop: send messages to the provider, receive tool calls, execute tools, and stream responses.
 4. Responses are published as `OutboundMessage` events back to the appropriate channel.
 
 ### Key Subsystems
 
-- **Agent Loop** (`Dzeck/agent/loop.py`, `runner.py`): The core processing engine. `AgentLoop` manages session keys, hooks, and context building. `AgentRunner` executes the multi-turn LLM conversation with tool execution.
+- **Agent Loop** (`dzeck/agent/loop.py`, `runner.py`): The core processing engine. `AgentLoop` manages session keys, hooks, and context building. `AgentRunner` executes the multi-turn LLM conversation with tool execution.
 - **LLM Providers** (`Dzeck/providers/`): Provider implementations (Anthropic, OpenAI-compatible, OpenAI Responses API, Azure, Bedrock, GitHub Copilot, OpenAI Codex, etc.) built on a common base (`base.py`). Includes image generation (`image_generation.py`) and audio transcription (`transcription.py`). `factory.py` and `registry.py` handle instantiation and model discovery.
 - **Channels** (`Dzeck/channels/`): Platform integrations (Telegram, Discord, Slack, Feishu, Matrix, WhatsApp, QQ, WeChat, WeCom, DingTalk, Email, MoChat, MS Teams, WebSocket). `manager.py` discovers and coordinates them. Channels are auto-discovered via `pkgutil` scan + entry-point plugins.
 - **Tools** (`Dzeck/agent/tools/`): Agent capabilities exposed to the LLM: filesystem (read/write/edit/list), shell execution (with sandbox backends), web search/fetch, MCP servers, cron, notebook editing, subagent spawning, long-running tasks / sustained goals (`long_task.py`), image generation, and self-modification. Tools are auto-discovered via `pkgutil` scan + entry-point plugins.
-- **Memory** (`Dzeck/agent/memory.py`): Session history persistence with Dream two-phase memory consolidation. Uses atomic writes with fsync for durability.
+- **Memory** (`dzeck/agent/memory.py`): Session history persistence with Dream two-phase memory consolidation. Uses atomic writes with fsync for durability.
 - **Session Management** (`Dzeck/session/`): Per-session history, context compaction, TTL-based auto-compaction (`manager.py`), and sustained goal state tracking (`goal_state.py`).
-- **Config** (`Dzeck/config/schema.py`, `loader.py`): Pydantic-based configuration loaded from `~/.Dzeck/config.json`. Supports camelCase aliases for JSON compatibility.
+- **Config** (`dzeck/config/schema.py`, `loader.py`): Pydantic-based configuration loaded from `~/.dzeck/config.json`. Supports camelCase aliases for JSON compatibility.
 - **Bridge** (`bridge/`): TypeScript services (e.g. WhatsApp bridge) bundled into the wheel via `pyproject.toml` `force-include`.
 - **WebUI** (`webui/`): Vite-based React SPA that talks to the gateway over a WebSocket multiplex protocol. The dev server proxies `/api`, `/webui`, `/auth`, and WebSocket traffic to the gateway.
-- **API Server** (`Dzeck/api/server.py`): OpenAI-compatible HTTP API (`/v1/chat/completions`, `/v1/models`) for programmatic access.
+- **API Server** (`dzeck/api/server.py`): OpenAI-compatible HTTP API (`/v1/chat/completions`, `/v1/models`) for programmatic access.
 - **Command Router** (`Dzeck/command/`): Slash command routing and built-in command handlers.
 - **Heartbeat** (`Dzeck/templates/HEARTBEAT.md`): Periodic task list checked via `cron` jobs (legacy dedicated service removed).
 - **Pairing** (`Dzeck/pairing/`): DM sender approval store with persistent pairing codes per channel.
@@ -52,8 +52,8 @@ Messages flow through an async `MessageBus` (`Dzeck/bus/queue.py`) that decouple
 
 ### Entry Points
 
-- **CLI**: `Dzeck/cli/commands.py`
-- **Python SDK**: `Dzeck/Dzeck.py`
+- **CLI**: `dzeck/cli/commands.py`
+- **Python SDK**: `dzeck/Dzeck.py`
 
 ## Project-Specific Notes
 
@@ -74,9 +74,9 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for the full two-branch model (`main`
 
 ## Common File Locations
 
-- Config schema: `Dzeck/config/schema.py`
-- Provider base / new provider template: `Dzeck/providers/base.py`
-- Channel base / new channel template: `Dzeck/channels/base.py`
-- Tool registry: `Dzeck/agent/tools/registry.py`
+- Config schema: `dzeck/config/schema.py`
+- Provider base / new provider template: `dzeck/providers/base.py`
+- Channel base / new channel template: `dzeck/channels/base.py`
+- Tool registry: `dzeck/agent/tools/registry.py`
 - WebUI dev proxy config: `webui/vite.config.ts`
 - Tests mirror the `Dzeck/` package structure.

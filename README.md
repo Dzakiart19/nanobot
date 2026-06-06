@@ -201,10 +201,10 @@ pip install Dzeck-ai
 **1. Initialize**
 
 ```bash
-Dzeck onboard
+dzeck onboard
 ```
 
-**2. Configure** (`~/.Dzeck/config.json`)
+**2. Configure** (`~/.dzeck/config.json`)
 
 Configure these **two parts** in your config (other options have defaults). Add or merge the following blocks into your existing config instead of replacing the whole file.
 
@@ -236,7 +236,7 @@ Configure these **two parts** in your config (other options have defaults). Add 
 **3. Chat**
 
 ```bash
-Dzeck agent
+dzeck agent
 ```
 
 
@@ -253,7 +253,7 @@ The WebUI ships **inside the published wheel** — no extra build step. Just ena
   <img src="images/Dzeck_webui.png" alt="Dzeck webui preview" width="900">
 </p>
 
-**1. Enable the WebSocket channel in `~/.Dzeck/config.json`**
+**1. Enable the WebSocket channel in `~/.dzeck/config.json`**
 
 ```json
 { "channels": { "websocket": { "enabled": true } } }
@@ -262,7 +262,7 @@ The WebUI ships **inside the published wheel** — no extra build step. Just ena
 **2. Start the gateway**
 
 ```bash
-Dzeck gateway
+dzeck gateway
 ```
 
 **3. Open the WebUI**

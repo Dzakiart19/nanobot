@@ -6,7 +6,7 @@ Build a custom Dzeck channel in three steps: subclass, package, install.
 
 ## How It Works
 
-Dzeck discovers channel plugins via Python [entry points](https://packaging.python.org/en/latest/specifications/entry-points/). When `Dzeck gateway` starts, it scans:
+Dzeck discovers channel plugins via Python [entry points](https://packaging.python.org/en/latest/specifications/entry-points/). When `dzeck gateway` starts, it scans:
 
 1. Built-in channels in `Dzeck/channels/`
 2. External packages registered under the `Dzeck.channels` entry point group
@@ -154,11 +154,11 @@ The key (`webhook`) becomes the config section name. The value points to your `B
 
 ```bash
 pip install -e .
-Dzeck plugins list      # verify "Webhook" shows as "plugin"
-Dzeck onboard           # auto-adds default config for detected plugins
+dzeck plugins list      # verify "Webhook" shows as "plugin"
+dzeck onboard           # auto-adds default config for detected plugins
 ```
 
-Edit `~/.Dzeck/config.json`:
+Edit `~/.dzeck/config.json`:
 
 ```json
 {
@@ -175,7 +175,7 @@ Edit `~/.Dzeck/config.json`:
 ### 4. Run & Test
 
 ```bash
-Dzeck gateway
+dzeck gateway
 ```
 
 In another terminal:
@@ -223,8 +223,8 @@ Channels that don't need interactive login (e.g. Telegram with bot token, Discor
 
 Users trigger interactive login via:
 ```bash
-Dzeck channels login <channel_name>
-Dzeck channels login <channel_name> --force  # re-authenticate
+dzeck channels login <channel_name>
+dzeck channels login <channel_name> --force  # re-authenticate
 ```
 
 ### Provided by Base
@@ -233,7 +233,7 @@ Dzeck channels login <channel_name> --force  # re-authenticate
 |-------------------|-------------|
 | `_handle_message(sender_id, chat_id, content, media?, metadata?, session_key?)` | **Call this when you receive a message.** Checks `is_allowed()`, then publishes to the bus. Automatically sets `_wants_stream` if `supports_streaming` is true. |
 | `is_allowed(sender_id)` | Checks against `config.allow_from`; `"*"` allows all, `[]` denies all. |
-| `default_config()` (classmethod) | Returns default config dict for `Dzeck onboard`. Override to declare your fields. |
+| `default_config()` (classmethod) | Returns default config dict for `dzeck onboard`. Override to declare your fields. |
 | `transcribe_audio(file_path)` | Transcribes audio via Groq Whisper (if configured). |
 | `supports_streaming` (property) | `True` when config has `"streaming": true` **and** subclass overrides `send_delta()`. |
 | `is_running` | Returns `self._running`. |
@@ -507,7 +507,7 @@ async def start(self) -> None:
 
 `allowFrom` is handled automatically by `_handle_message()` — you don't need to check it yourself.
 
-Override `default_config()` so `Dzeck onboard` auto-populates `config.json`:
+Override `default_config()` so `dzeck onboard` auto-populates `config.json`:
 
 ```python
 @classmethod
@@ -534,8 +534,8 @@ If not overridden, the base class returns `{"enabled": false}`.
 git clone https://github.com/you/Dzeck-channel-webhook
 cd Dzeck-channel-webhook
 pip install -e .
-Dzeck plugins list    # should show "Webhook" as "plugin"
-Dzeck gateway         # test end-to-end
+dzeck plugins list    # should show "Webhook" as "plugin"
+dzeck gateway         # test end-to-end
 ```
 
 ## Verify

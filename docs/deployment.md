@@ -11,7 +11,7 @@
 > Official Docker usage currently means building from this repository with the included `Dockerfile`. Docker Hub images under third-party namespaces are not maintained or verified by HKUDS/Dzeck; do not mount API keys or bot tokens into them unless you trust the publisher.
 
 > [!IMPORTANT]
-> The gateway and WebSocket channel default to `host: "127.0.0.1"` in `config.json` (set in `Dzeck/config/schema.py`). Docker `-p` port forwarding cannot reach a container's loopback interface, so for the host or LAN to reach the exposed ports you must set both binds to `0.0.0.0` in `~/.Dzeck/config.json` before starting the container. To serve the bundled WebUI from Docker, enable the WebSocket channel and protect bootstrap with a secret:
+> The gateway and WebSocket channel default to `host: "127.0.0.1"` in `config.json` (set in `dzeck/config/schema.py`). Docker `-p` port forwarding cannot reach a container's loopback interface, so for the host or LAN to reach the exposed ports you must set both binds to `0.0.0.0` in `~/.dzeck/config.json` before starting the container. To serve the bundled WebUI from Docker, enable the WebSocket channel and protect bootstrap with a secret:
 >
 > ```json
 > {
@@ -33,7 +33,7 @@
 
 ```bash
 docker compose run --rm Dzeck-cli onboard   # first-time setup
-vim ~/.Dzeck/config.json                     # add API keys
+vim ~/.dzeck/config.json                     # add API keys
 docker compose up -d Dzeck-gateway           # start gateway
 ```
 
@@ -53,7 +53,7 @@ docker build -t Dzeck .
 docker run -v ~/.Dzeck:/home/Dzeck/.Dzeck --rm Dzeck onboard
 
 # Edit config on host to add API keys
-vim ~/.Dzeck/config.json
+vim ~/.dzeck/config.json
 
 # Run gateway (connects to enabled channels, e.g. Telegram/Discord/Mochat).
 # Mirrors the security caps and port mappings declared in docker-compose.yml:
@@ -68,7 +68,7 @@ docker run \
   --security-opt seccomp=unconfined \
   -v ~/.Dzeck:/home/Dzeck/.Dzeck \
   -p 18790:18790 -p 8765:8765 \
-  Dzeck gateway
+  dzeck gateway
 
 # Or run a single command
 docker run -v ~/.Dzeck:/home/Dzeck/.Dzeck --rm Dzeck agent -m "Hello!"
@@ -130,7 +130,7 @@ If you edit the `.service` file itself, run `systemctl --user daemon-reload` bef
 
 ## macOS LaunchAgent
 
-Use a LaunchAgent when you want `Dzeck gateway` to stay online after you log in, without keeping a terminal open.
+Use a LaunchAgent when you want `dzeck gateway` to stay online after you log in, without keeping a terminal open.
 
 **1. Get the absolute `Dzeck` path:**
 
@@ -182,7 +182,7 @@ Use that exact path in the plist. It keeps the Python environment from your inst
 **3. Load and start it:**
 
 ```bash
-mkdir -p ~/Library/LaunchAgents ~/.Dzeck/logs
+mkdir -p ~/Library/LaunchAgents ~/.dzeck/logs
 launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/ai.Dzeck.gateway.plist
 launchctl enable gui/$(id -u)/ai.Dzeck.gateway
 launchctl kickstart -k gui/$(id -u)/ai.Dzeck.gateway
@@ -198,4 +198,4 @@ launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/ai.Dzeck.gateway.plist
 
 After editing the plist, run `launchctl bootout ...` and `launchctl bootstrap ...` again.
 
-> **Note:** if startup fails with "address already in use", stop the manually started `Dzeck gateway` process first.
+> **Note:** if startup fails with "address already in use", stop the manually started `dzeck gateway` process first.

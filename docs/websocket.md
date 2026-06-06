@@ -37,7 +37,7 @@ Add to `config.json` under `channels.websocket`:
 ### 2. Start Dzeck
 
 ```bash
-Dzeck gateway
+dzeck gateway
 ```
 
 You should see:

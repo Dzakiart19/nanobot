@@ -1,10 +1,10 @@
 # Configuration
 
-Config file: `~/.Dzeck/config.json`
+Config file: `~/.dzeck/config.json`
 
 > [!NOTE]
 > If your config file is older than the current schema, you can refresh it without overwriting your existing values:
-> run `Dzeck onboard`, then answer `N` when asked whether to overwrite the config.
+> run `dzeck onboard`, then answer `N` when asked whether to overwrite the config.
 > Dzeck will merge in missing default fields and keep your current settings.
 
 ## Environment Variables for Secrets
@@ -26,7 +26,7 @@ Instead of storing secrets directly in `config.json`, you can use `${VAR_NAME}` 
 }
 ```
 
-Any string value in `config.json` can use `${VAR_NAME}`. Resolution runs once at startup, in memory only — resolved values are never written back to disk, so editing config through `Dzeck onboard` or the WebUI preserves the placeholder.
+Any string value in `config.json` can use `${VAR_NAME}`. Resolution runs once at startup, in memory only — resolved values are never written back to disk, so editing config through `dzeck onboard` or the WebUI preserves the placeholder.
 
 If a referenced variable is unset, Dzeck fails fast at startup with `ValueError: Environment variable 'NAME' referenced in config is not set`.
 
@@ -92,7 +92,7 @@ IMAP_PASSWORD=your-password-here
 ```bash
 docker run --rm --env-file=./Dzeck.env \
   -v ~/.Dzeck:/home/Dzeck/.Dzeck \
-  Dzeck agent -m "Hello"
+  dzeck agent -m "Hello"
 ```
 
 **direnv** — drop a `.envrc` in your working directory and run `direnv allow`:
@@ -164,8 +164,8 @@ ANTHROPIC_API_KEY="$(bw get password api/anthropic)" Dzeck agent
 | `stepfun` | LLM (Step Fun/阶跃星辰) | [platform.stepfun.com](https://platform.stepfun.com) |
 | `ovms` | LLM (local, OpenVINO Model Server) | [docs.openvino.ai](https://docs.openvino.ai/2026/model-server/ovms_docs_llm_quickstart.html) |
 | `vllm` | LLM (local, any OpenAI-compatible server) | — |
-| `openai_codex` | LLM (Codex, OAuth) | `Dzeck provider login openai-codex` |
-| `github_copilot` | LLM (GitHub Copilot, OAuth) | `Dzeck provider login github-copilot` |
+| `openai_codex` | LLM (Codex, OAuth) | `dzeck provider login openai-codex` |
+| `github_copilot` | LLM (GitHub Copilot, OAuth) | `dzeck provider login github-copilot` |
 | `qianfan` | LLM (Baidu Qianfan) | [cloud.baidu.com](https://cloud.baidu.com/doc/qianfan/s/Hmh4suq26) |
 
 <details>
@@ -473,7 +473,7 @@ export AWS_REGION="us-east-1"
 Then run:
 
 ```bash
-Dzeck agent -m "Reply with one short sentence."
+dzeck agent -m "Reply with one short sentence."
 ```
 
 </details>
@@ -483,14 +483,14 @@ Dzeck agent -m "Reply with one short sentence."
 <summary><b>OpenAI Codex (OAuth)</b></summary>
 
 Codex uses OAuth instead of API keys. Requires a ChatGPT Plus or Pro account.
-No `providers.openaiCodex` block is needed in `config.json`; `Dzeck provider login` stores the OAuth session outside config.
+No `providers.openaiCodex` block is needed in `config.json`; `dzeck provider login` stores the OAuth session outside config.
 
 **1. Login:**
 ```bash
-Dzeck provider login openai-codex
+dzeck provider login openai-codex
 ```
 
-**2. Set model** (merge into `~/.Dzeck/config.json`):
+**2. Set model** (merge into `~/.dzeck/config.json`):
 ```json
 {
   "agents": {
@@ -503,13 +503,13 @@ Dzeck provider login openai-codex
 
 **3. Chat:**
 ```bash
-Dzeck agent -m "Hello!"
+dzeck agent -m "Hello!"
 
 # Target a specific workspace/config locally
-Dzeck agent -c ~/.Dzeck-telegram/config.json -m "Hello!"
+dzeck agent -c ~/.Dzeck-telegram/config.json -m "Hello!"
 
 # One-off workspace override on top of that config
-Dzeck agent -c ~/.Dzeck-telegram/config.json -w /tmp/Dzeck-telegram-test -m "Hello!"
+dzeck agent -c ~/.Dzeck-telegram/config.json -w /tmp/dzeck-telegram-test -m "Hello!"
 ```
 
 > Docker users: use `docker run -it` for interactive OAuth login.
@@ -521,14 +521,14 @@ Dzeck agent -c ~/.Dzeck-telegram/config.json -w /tmp/Dzeck-telegram-test -m "Hel
 <summary><b>GitHub Copilot (OAuth)</b></summary>
 
 GitHub Copilot uses OAuth instead of API keys. Requires a [GitHub account with a plan](https://github.com/features/copilot/plans) configured.
-No `providers.githubCopilot` block is needed in `config.json`; `Dzeck provider login` stores the OAuth session outside config.
+No `providers.githubCopilot` block is needed in `config.json`; `dzeck provider login` stores the OAuth session outside config.
 
 **1. Login:**
 ```bash
-Dzeck provider login github-copilot
+dzeck provider login github-copilot
 ```
 
-**2. Set model** (merge into `~/.Dzeck/config.json`):
+**2. Set model** (merge into `~/.dzeck/config.json`):
 ```json
 {
   "agents": {
@@ -541,13 +541,13 @@ Dzeck provider login github-copilot
 
 **3. Chat:**
 ```bash
-Dzeck agent -m "Hello!"
+dzeck agent -m "Hello!"
 
 # Target a specific workspace/config locally
-Dzeck agent -c ~/.Dzeck-telegram/config.json -m "Hello!"
+dzeck agent -c ~/.Dzeck-telegram/config.json -m "Hello!"
 
 # One-off workspace override on top of that config
-Dzeck agent -c ~/.Dzeck-telegram/config.json -w /tmp/Dzeck-telegram-test -m "Hello!"
+dzeck agent -c ~/.Dzeck-telegram/config.json -w /tmp/dzeck-telegram-test -m "Hello!"
 ```
 
 > Docker users: use `docker run -it` for interactive OAuth login.
@@ -752,7 +752,7 @@ Run a local model with Ollama, then add to config:
 ollama run llama3.2
 ```
 
-**2. Add to config** (partial — merge into `~/.Dzeck/config.json`):
+**2. Add to config** (partial — merge into `~/.dzeck/config.json`):
 ```json
 {
   "providers": {
@@ -784,7 +784,7 @@ ollama run llama3.2
 - Load a model (e.g., Llama, Mistral, Qwen)
 - Click "Start Server" (default port: 1234)
 
-**2. Add to config** (partial — merge into `~/.Dzeck/config.json`):
+**2. Add to config** (partial — merge into `~/.dzeck/config.json`):
 ```json
 {
   "providers": {
@@ -819,7 +819,7 @@ ollama run llama3.2
 - Open Atomic Chat, download a model, and keep the app running. The local API is enabled by default.
 - Copy the model ID exposed by the local API. For example, the model ID for `Qwen 3 32B` might be `qwen3-32b`.
 
-**2. Add to config** (partial — merge into `~/.Dzeck/config.json`):
+**2. Add to config** (partial — merge into `~/.dzeck/config.json`):
 
 ```json
 {
@@ -897,7 +897,7 @@ docker run -d \
   --target_device GPU
 ```
 
-**3. Add to config** (partial — merge into `~/.Dzeck/config.json`):
+**3. Add to config** (partial — merge into `~/.dzeck/config.json`):
 
 ```json
 {
@@ -930,7 +930,7 @@ Run your own model with vLLM or any OpenAI-compatible server, then add to config
 vllm serve meta-llama/Llama-3.1-8B-Instruct --port 8000
 ```
 
-**2. Add to config** (partial — merge into `~/.Dzeck/config.json`):
+**2. Add to config** (partial — merge into `~/.dzeck/config.json`):
 
 *Provider (set API key to null for local servers):*
 ```json
@@ -960,22 +960,22 @@ vllm serve meta-llama/Llama-3.1-8B-Instruct --port 8000
 <details>
 <summary><b>Adding a New Provider (Developer Guide)</b></summary>
 
-Dzeck uses a **Provider Registry** (`Dzeck/providers/registry.py`) as the single source of truth.
+Dzeck uses a **Provider Registry** (`dzeck/providers/registry.py`) as the single source of truth.
 Adding a new provider only takes **2 steps** — no if-elif chains to touch.
 
-**Step 1.** Add a `ProviderSpec` entry to `PROVIDERS` in `Dzeck/providers/registry.py`:
+**Step 1.** Add a `ProviderSpec` entry to `PROVIDERS` in `dzeck/providers/registry.py`:
 
 ```python
 ProviderSpec(
     name="myprovider",                   # config field name
     keywords=("myprovider", "mymodel"),  # model-name keywords for auto-matching
     env_key="MYPROVIDER_API_KEY",        # env var name
-    display_name="My Provider",          # shown in `Dzeck status`
+    display_name="My Provider",          # shown in `dzeck status`
     default_api_base="https://api.myprovider.com/v1",  # OpenAI-compatible endpoint
 )
 ```
 
-**Step 2.** Add a field to `ProvidersConfig` in `Dzeck/config/schema.py`:
+**Step 2.** Add a field to `ProvidersConfig` in `dzeck/config/schema.py`:
 
 ```python
 class ProvidersConfig(BaseModel):
@@ -983,7 +983,7 @@ class ProvidersConfig(BaseModel):
     myprovider: ProviderConfig = ProviderConfig()
 ```
 
-That's it! Environment variables, model routing, config matching, and `Dzeck status` display will all work automatically.
+That's it! Environment variables, model routing, config matching, and `dzeck status` display will all work automatically.
 
 **Common `ProviderSpec` options:**
 
@@ -1102,7 +1102,7 @@ When `modelPreset` is `null` or omitted, startup uses the implicit `default` pre
 
 ## Channel Settings
 
-Global settings that apply to all channels. Configure under the `channels` section in `~/.Dzeck/config.json`:
+Global settings that apply to all channels. Configure under the `channels` section in `~/.dzeck/config.json`:
 
 ```json
 {
@@ -1170,7 +1170,7 @@ When a channel `send()` raises, Dzeck retries at the channel-manager layer. By d
 
 ## Web Tools
 
-Dzeck incorporates basic tools for accessing the web. These include searching via APIs, and fetching arbitrary web pages in Markdown format. They are enabled by default, and can be configured in `~/.Dzeck/config.json` under `tools.web`.
+Dzeck incorporates basic tools for accessing the web. These include searching via APIs, and fetching arbitrary web pages in Markdown format. They are enabled by default, and can be configured in `~/.dzeck/config.json` under `tools.web`.
 
 If you want to disable them, which removes both `web_search` and `web_fetch` from the tool list sent to the LLM, set `tools.web.enable` to `false`:
 
@@ -1210,7 +1210,7 @@ If you need to allow trusted private ranges such as Tailscale / CGNAT addresses,
 
 ### Web Search
 
-Dzeck supports multiple web search providers. Configure in `~/.Dzeck/config.json` under `tools.web.search`.
+Dzeck supports multiple web search providers. Configure in `~/.dzeck/config.json` under `tools.web.search`.
 
 By default, web search uses `duckduckgo`, and it works out of the box without an API key.
 
@@ -1544,8 +1544,8 @@ You can find user IDs in the output of `/pairing list`.
 From the terminal:
 
 ```bash
-Dzeck agent -m "/pairing list"
-Dzeck agent -m "/pairing approve ABCD-EFGH"
+dzeck agent -m "/pairing list"
+dzeck agent -m "/pairing approve ABCD-EFGH"
 ```
 
 

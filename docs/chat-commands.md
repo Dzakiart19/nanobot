@@ -57,9 +57,9 @@ Preset names come from the top-level `modelPresets` config. Switching is runtime
 
 ## Periodic Tasks
 
-The gateway wakes up every 30 minutes and checks `HEARTBEAT.md` in your workspace (`~/.Dzeck/workspace/HEARTBEAT.md`). If the file has tasks under `## Active Tasks`, the agent executes them and delivers results to your most recently active chat channel. If there are no active tasks, the heartbeat is skipped silently.
+The gateway wakes up every 30 minutes and checks `HEARTBEAT.md` in your workspace (`~/.dzeck/workspace/HEARTBEAT.md`). If the file has tasks under `## Active Tasks`, the agent executes them and delivers results to your most recently active chat channel. If there are no active tasks, the heartbeat is skipped silently.
 
-**Setup:** edit `~/.Dzeck/workspace/HEARTBEAT.md` (created automatically by `Dzeck onboard`):
+**Setup:** edit `~/.dzeck/workspace/HEARTBEAT.md` (created automatically by `dzeck onboard`):
 
 ```markdown
 ## Active Tasks
@@ -70,4 +70,4 @@ The gateway wakes up every 30 minutes and checks `HEARTBEAT.md` in your workspac
 
 The agent can also manage this file itself — ask it to "add a periodic task" and it will update `HEARTBEAT.md` for you. Completed tasks should be deleted from the file, not moved to another section.
 
-> **Note:** The gateway must be running (`Dzeck gateway`) and you must have chatted with the bot at least once so it knows which channel to deliver to.
+> **Note:** The gateway must be running (`dzeck gateway`) and you must have chatted with the bot at least once so it knows which channel to deliver to.

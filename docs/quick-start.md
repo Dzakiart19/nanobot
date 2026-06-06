@@ -46,14 +46,14 @@ Dzeck --version
 **Using WhatsApp?** Rebuild the local bridge after upgrading:
 
 ```bash
-rm -rf ~/.Dzeck/bridge
-Dzeck channels login whatsapp
+rm -rf ~/.dzeck/bridge
+dzeck channels login whatsapp
 ```
 
 ## Quick Start
 
 > [!TIP]
-> Set your API key in `~/.Dzeck/config.json`.
+> Set your API key in `~/.dzeck/config.json`.
 > Get API keys: [OpenRouter](https://openrouter.ai/keys) (Global)
 >
 > For other LLM providers, please see [`configuration.md`](./configuration.md).
@@ -63,12 +63,12 @@ Dzeck channels login whatsapp
 **1. Initialize**
 
 ```bash
-Dzeck onboard
+dzeck onboard
 ```
 
-Use `Dzeck onboard --wizard` if you want the interactive setup wizard.
+Use `dzeck onboard --wizard` if you want the interactive setup wizard.
 
-**2. Configure** (`~/.Dzeck/config.json`)
+**2. Configure** (`~/.dzeck/config.json`)
 
 Configure these **two parts** in your config (other options have defaults).
 
@@ -98,7 +98,7 @@ Configure these **two parts** in your config (other options have defaults).
 **3. Chat**
 
 ```bash
-Dzeck agent
+dzeck agent
 ```
 
 That's it! You have a working AI agent in 2 minutes.

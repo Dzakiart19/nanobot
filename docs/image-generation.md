@@ -2,7 +2,7 @@
 
 Dzeck can generate and edit images through the `generate_image` tool. In the WebUI, users can enable **Image Generation** from the composer, choose an aspect ratio, and keep iterating on generated images inside the same chat.
 
-The feature is disabled by default. Enable it in `~/.Dzeck/config.json`, configure a supported image provider, then restart the gateway.
+The feature is disabled by default. Enable it in `~/.dzeck/config.json`, configure a supported image provider, then restart the gateway.
 
 ## Quick Setup
 
@@ -315,8 +315,8 @@ Other supported models: `cogview-4`, `cogview-4-250304`, `cogview-3-flash`. Refe
 Generated images are stored under the active Dzeck instance's media directory:
 
 ```text
-~/.Dzeck/media/generated/YYYY-MM-DD/img_<id>.<ext>
-~/.Dzeck/media/generated/YYYY-MM-DD/img_<id>.json
+~/.dzeck/media/generated/YYYY-MM-DD/img_<id>.<ext>
+~/.dzeck/media/generated/YYYY-MM-DD/img_<id>.json
 ```
 
 For non-default config locations, the media directory is relative to the active config file's directory.

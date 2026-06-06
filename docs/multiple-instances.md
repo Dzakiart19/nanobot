@@ -10,9 +10,9 @@ If you want each instance to have its own dedicated workspace from the start, pa
 
 ```bash
 # Create separate instance configs and workspaces
-Dzeck onboard --config ~/.Dzeck-telegram/config.json --workspace ~/.Dzeck-telegram/workspace
-Dzeck onboard --config ~/.Dzeck-discord/config.json --workspace ~/.Dzeck-discord/workspace
-Dzeck onboard --config ~/.Dzeck-feishu/config.json --workspace ~/.Dzeck-feishu/workspace
+dzeck onboard --config ~/.Dzeck-telegram/config.json --workspace ~/.Dzeck-telegram/workspace
+dzeck onboard --config ~/.Dzeck-discord/config.json --workspace ~/.Dzeck-discord/workspace
+dzeck onboard --config ~/.Dzeck-feishu/config.json --workspace ~/.Dzeck-feishu/workspace
 ```
 
 **Configure each instance:**
@@ -23,13 +23,13 @@ Edit `~/.Dzeck-telegram/config.json`, `~/.Dzeck-discord/config.json`, etc. with 
 
 ```bash
 # Instance A - Telegram bot
-Dzeck gateway --config ~/.Dzeck-telegram/config.json
+dzeck gateway --config ~/.Dzeck-telegram/config.json
 
 # Instance B - Discord bot
-Dzeck gateway --config ~/.Dzeck-discord/config.json
+dzeck gateway --config ~/.Dzeck-discord/config.json
 
 # Instance C - Feishu bot with custom port
-Dzeck gateway --config ~/.Dzeck-feishu/config.json --port 18792
+dzeck gateway --config ~/.Dzeck-feishu/config.json --port 18792
 ```
 
 ## Path Resolution
@@ -39,14 +39,14 @@ When using `--config`, Dzeck derives its runtime data directory from the config 
 To open a CLI session against one of these instances locally:
 
 ```bash
-Dzeck agent -c ~/.Dzeck-telegram/config.json -m "Hello from Telegram instance"
-Dzeck agent -c ~/.Dzeck-discord/config.json -m "Hello from Discord instance"
+dzeck agent -c ~/.Dzeck-telegram/config.json -m "Hello from Telegram instance"
+dzeck agent -c ~/.Dzeck-discord/config.json -m "Hello from Discord instance"
 
 # Optional one-off workspace override
-Dzeck agent -c ~/.Dzeck-telegram/config.json -w /tmp/Dzeck-telegram-test
+dzeck agent -c ~/.Dzeck-telegram/config.json -w /tmp/dzeck-telegram-test
 ```
 
-> `Dzeck agent` starts a local CLI agent using the selected workspace/config. It does not attach to or proxy through an already running `Dzeck gateway` process.
+> `dzeck agent` starts a local CLI agent using the selected workspace/config. It does not attach to or proxy through an already running `dzeck gateway` process.
 
 | Component | Resolved From | Example |
 |-----------|---------------|---------|
@@ -93,8 +93,8 @@ Example config:
 Start separate instances:
 
 ```bash
-Dzeck gateway --config ~/.Dzeck-telegram/config.json
-Dzeck gateway --config ~/.Dzeck-discord/config.json
+dzeck gateway --config ~/.Dzeck-telegram/config.json
+dzeck gateway --config ~/.Dzeck-discord/config.json
 ```
 
 Each gateway instance also exposes a lightweight HTTP health endpoint on
@@ -108,7 +108,7 @@ public or LAN-facing address.
 Override workspace for one-off runs when needed:
 
 ```bash
-Dzeck gateway --config ~/.Dzeck-telegram/config.json --workspace /tmp/Dzeck-telegram-test
+dzeck gateway --config ~/.Dzeck-telegram/config.json --workspace /tmp/dzeck-telegram-test
 ```
 
 ## Common Use Cases

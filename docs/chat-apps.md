@@ -6,8 +6,8 @@ Connect Dzeck to your favorite chat platform. Want to build your own? See the [C
 |---------|---------------|
 | **Telegram** | Bot token from @BotFather |
 | **Discord** | Bot token + Message Content intent |
-| **WhatsApp** | QR code scan (`Dzeck channels login whatsapp`) |
-| **WeChat (Weixin)** | QR code scan (`Dzeck channels login weixin`) |
+| **WhatsApp** | QR code scan (`dzeck channels login whatsapp`) |
+| **WeChat (Weixin)** | QR code scan (`dzeck channels login weixin`) |
 | **Feishu** | App ID + App Secret |
 | **DingTalk** | App Key + App Secret |
 | **Slack** | Bot token + App-Level token |
@@ -49,7 +49,7 @@ Connect Dzeck to your favorite chat platform. Want to build your own? See the [C
 **3. Run**
 
 ```bash
-Dzeck gateway
+dzeck gateway
 ```
 
 **Webhook mode (optional)**
@@ -104,12 +104,12 @@ Simply send this message to Dzeck (replace `xxx@xxx` with your real email):
 Read https://raw.githubusercontent.com/HKUDS/MoChat/refs/heads/main/skills/Dzeck/skill.md and register on MoChat. My Email account is xxx@xxx Bind me as your owner and DM me on MoChat.
 ```
 
-Dzeck will automatically register, configure `~/.Dzeck/config.json`, and connect to Mochat.
+Dzeck will automatically register, configure `~/.dzeck/config.json`, and connect to Mochat.
 
 **2. Restart gateway**
 
 ```bash
-Dzeck gateway
+dzeck gateway
 ```
 
 That's it — Dzeck handles the rest!
@@ -119,7 +119,7 @@ That's it — Dzeck handles the rest!
 <details>
 <summary>Manual configuration (advanced)</summary>
 
-If you prefer to configure manually, add the following to `~/.Dzeck/config.json`:
+If you prefer to configure manually, add the following to `~/.dzeck/config.json`:
 
 > Keep `claw_token` private. It should only be sent in `X-Claw-Token` header to your Mochat API endpoint.
 
@@ -198,7 +198,7 @@ If you prefer to configure manually, add the following to `~/.Dzeck/config.json`
 **6. Run**
 
 ```bash
-Dzeck gateway
+dzeck gateway
 ```
 
 </details>
@@ -274,7 +274,7 @@ for reliable encryption, password login is recommended instead. If the
 **4. Run**
 
 ```bash
-Dzeck gateway
+dzeck gateway
 ```
 
 </details>
@@ -287,7 +287,7 @@ Requires **Node.js ≥18**.
 **1. Link device**
 
 ```bash
-Dzeck channels login whatsapp
+dzeck channels login whatsapp
 # Scan QR with WhatsApp → Settings → Linked Devices
 ```
 
@@ -308,15 +308,15 @@ Dzeck channels login whatsapp
 
 ```bash
 # Terminal 1
-Dzeck channels login whatsapp
+dzeck channels login whatsapp
 
 # Terminal 2
-Dzeck gateway
+dzeck gateway
 ```
 
 > WhatsApp bridge updates are not applied automatically for existing installations.
 > After upgrading Dzeck, rebuild the local bridge with:
-> `rm -rf ~/.Dzeck/bridge && Dzeck channels login whatsapp`
+> `rm -rf ~/.dzeck/bridge && Dzeck channels login whatsapp`
 
 </details>
 
@@ -372,7 +372,7 @@ Uses **WebSocket** long connection — no public IP required.
 **3. Run**
 
 ```bash
-Dzeck gateway
+dzeck gateway
 ```
 
 > [!TIP]
@@ -418,7 +418,7 @@ Uses **botpy SDK** with WebSocket — no public IP required. Currently supports 
 **4. Run**
 
 ```bash
-Dzeck gateway
+dzeck gateway
 ```
 
 Now send a message to the bot from QQ — it should respond!
@@ -508,7 +508,7 @@ Uses **Stream Mode** — no public IP required.
 **3. Run**
 
 ```bash
-Dzeck gateway
+dzeck gateway
 ```
 
 </details>
@@ -550,7 +550,7 @@ Uses **Socket Mode** — no public URL required.
 **4. Run**
 
 ```bash
-Dzeck gateway
+dzeck gateway
 ```
 
 DM the bot directly or @mention it in a channel — it should respond!
@@ -607,7 +607,7 @@ Give Dzeck its own email account. It polls **IMAP** for incoming mail and replie
 **3. Run**
 
 ```bash
-Dzeck gateway
+dzeck gateway
 ```
 
 </details>
@@ -645,19 +645,19 @@ pip install "Dzeck-ai[weixin]"
 **3. Login**
 
 ```bash
-Dzeck channels login weixin
+dzeck channels login weixin
 ```
 
 Use `--force` to re-authenticate and ignore any saved token:
 
 ```bash
-Dzeck channels login weixin --force
+dzeck channels login weixin --force
 ```
 
 **4. Run**
 
 ```bash
-Dzeck gateway
+dzeck gateway
 ```
 
 </details>
@@ -697,7 +697,7 @@ Go to the WeCom admin console → Intelligent Robot → Create Robot → select 
 **4. Run**
 
 ```bash
-Dzeck gateway
+dzeck gateway
 ```
 
 </details>
@@ -755,7 +755,7 @@ Create or reuse a Microsoft Teams / Azure bot app registration. Set the bot mess
 **4. Run**
 
 ```bash
-Dzeck gateway
+dzeck gateway
 ```
 
 </details>
@@ -817,7 +817,7 @@ signal-cli -a +1234567890 daemon --http localhost:8080
 **3. Run**
 
 ```bash
-Dzeck gateway
+dzeck gateway
 ```
 
 > [!TIP]
