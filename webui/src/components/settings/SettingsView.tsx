@@ -167,7 +167,7 @@ type ProviderApiType = "auto" | "chat_completions" | "responses";
 type ProviderForm = { apiKey: string; apiBase: string; apiType: ProviderApiType };
 type CustomMcpTransport = "stdio" | "streamableHttp" | "sse";
 
-const NANOBOT_ICON_SRC = "/brand/nanobot_icon.png";
+const Dzeck_ICON_SRC = "/brand/Dzeck_icon.png";
 const CONTEXT_WINDOW_TOKEN_OPTIONS = [65_536, 262_144] as const;
 const DEFERRED_MODEL_LIST_PROVIDERS = new Set([
   "aihubmix",
@@ -222,7 +222,7 @@ interface CustomMcpForm {
   toolTimeout: string;
 }
 
-const LOCAL_PREFS_STORAGE_KEY = "nanobot-webui.settings-preferences";
+const LOCAL_PREFS_STORAGE_KEY = "dzeck-webui.settings-preferences";
 
 const DEFAULT_LOCAL_PREFS: LocalPreferences = {
   density: "comfortable",
@@ -1521,7 +1521,7 @@ function OverviewSettings({
         <div className="overflow-hidden rounded-[22px] border border-border/45 bg-card/86 shadow-[0_18px_65px_rgba(15,23,42,0.075)] backdrop-blur-xl dark:border-white/10 dark:shadow-[0_18px_65px_rgba(0,0,0,0.24)]">
           <div className="flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex min-w-0 items-center gap-3">
-              <NanobotBrandLogo size="lg" testId="overview-nanobot-logo" />
+              <DzeckBrandLogo size="lg" testId="overview-Dzeck-logo" />
               <div className="min-w-0">
                 <div className="text-[12px] font-medium text-muted-foreground">Dzeck</div>
                 <div className="mt-0.5 truncate text-[18px] font-semibold leading-6 text-foreground">
@@ -4901,7 +4901,7 @@ function ProviderIcon({
   );
 }
 
-function NanobotBrandLogo({
+function DzeckBrandLogo({
   size = "sm",
   testId,
 }: {
@@ -4918,7 +4918,7 @@ function NanobotBrandLogo({
       aria-hidden
     >
       <img
-        src={NANOBOT_ICON_SRC}
+        src={Dzeck_ICON_SRC}
         alt=""
         className={cn("select-none object-contain", size === "lg" ? "h-10 w-10" : "h-7 w-7")}
         draggable={false}

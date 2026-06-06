@@ -4,11 +4,11 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from nanobot.bus.events import OutboundMessage
-from nanobot.bus.queue import MessageBus
-from nanobot.channels.base import BaseChannel
-from nanobot.channels.manager import ChannelManager
-from nanobot.config.schema import Config
+from dzeck.bus.events import OutboundMessage
+from dzeck.bus.queue import MessageBus
+from dzeck.channels.base import BaseChannel
+from dzeck.channels.manager import ChannelManager
+from dzeck.config.schema import Config
 
 
 class MockChannel(BaseChannel):

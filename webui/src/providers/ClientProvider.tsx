@@ -1,9 +1,9 @@
 import { createContext, useContext, type ReactNode } from "react";
 
-import type { NanobotClient } from "@/lib/nanobot-client";
+import type { DzeckClient } from '@/lib/dzeck-client';
 
 interface ClientContextValue {
-  client: NanobotClient;
+  client: DzeckClient;
   token: string;
   modelName: string | null;
 }
@@ -16,7 +16,7 @@ export function ClientProvider({
   modelName = null,
   children,
 }: {
-  client: NanobotClient;
+  client: DzeckClient;
   token: string;
   modelName?: string | null;
   children: ReactNode;

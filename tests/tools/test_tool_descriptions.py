@@ -1,8 +1,8 @@
-from nanobot.agent.tools.apply_patch import ApplyPatchTool
-from nanobot.agent.tools.exec_session import ListExecSessionsTool, WriteStdinTool
-from nanobot.agent.tools.filesystem import EditFileTool, ReadFileTool, WriteFileTool
-from nanobot.agent.tools.search import FindFilesTool, GrepTool
-from nanobot.agent.tools.shell import ExecTool
+from dzeck.agent.tools.apply_patch import ApplyPatchTool
+from dzeck.agent.tools.exec_session import ListExecSessionsTool, WriteStdinTool
+from dzeck.agent.tools.filesystem import EditFileTool, ReadFileTool, WriteFileTool
+from dzeck.agent.tools.search import FindFilesTool, GrepTool
+from dzeck.agent.tools.shell import ExecTool
 
 
 def test_coding_tool_descriptions_steer_editing_priority() -> None:

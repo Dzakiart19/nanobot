@@ -43,7 +43,7 @@ function baseSettingsPayload() {
       temperature: 0.1,
       reasoning_effort: null,
       timezone: "UTC",
-      bot_name: "nanobot",
+      bot_name: "dzeck",
       bot_icon: "nb",
       tool_hint_max_length: 40,
     },
@@ -166,7 +166,7 @@ vi.mock("@/lib/bootstrap", () => ({
   clearSavedSecret: vi.fn(),
 }));
 
-vi.mock("@/lib/nanobot-client", () => {
+vi.mock("@/lib/dzeck-client", () => {
   class MockClient {
     status = "idle" as const;
     defaultChatId: string | null = null;
@@ -189,7 +189,7 @@ vi.mock("@/lib/nanobot-client", () => {
     updateUrl = updateUrlSpy;
   }
 
-  return { NanobotClient: MockClient };
+  return { DzeckClient: MockClient };
 });
 
 import { deriveWsUrl, fetchBootstrap } from "@/lib/bootstrap";
@@ -208,7 +208,7 @@ describe("App layout", () => {
     runStatusHandlers.clear();
     window.history.replaceState(null, "", "/");
     setNavigatorPlatform("Linux x86_64");
-    localStorage.removeItem("nanobot-webui.sidebar.completed-runs.v1");
+    localStorage.removeItem("dzeck-webui.sidebar.completed-runs.v1");
     vi.mocked(fetchBootstrap).mockReset().mockResolvedValue({
       token: "tok",
       ws_path: "/",
@@ -446,7 +446,7 @@ describe("App layout", () => {
         chatId: "new",
         createdAt: "2026-04-15T12:00:00Z",
         updatedAt: "2026-04-15T12:00:00Z",
-        preview: "hi nanobot",
+        preview: "hi dzeck",
       },
       {
         key: "websocket:alpha",
@@ -622,7 +622,7 @@ describe("App layout", () => {
       },
     ];
     localStorage.setItem(
-      "nanobot-webui.sidebar.completed-runs.v1",
+      "dzeck-webui.sidebar.completed-runs.v1",
       JSON.stringify(["chat-b"]),
     );
 
@@ -665,7 +665,7 @@ describe("App layout", () => {
     render(<App />);
 
     await waitFor(() => expect(connectSpy).toHaveBeenCalled());
-    await waitFor(() => expect(document.title).toBe("Active after reload · nanobot"));
+    await waitFor(() => expect(document.title).toBe("Active after reload · dzeck"));
     const sidebar = screen.getByRole("navigation", { name: "Sidebar navigation" });
     expect(
       within(sidebar).getByRole("button", { name: /^Active after reload$/ }),
@@ -720,7 +720,7 @@ describe("App layout", () => {
                 temperature: 0.1,
                 reasoning_effort: null,
                 timezone: "UTC",
-                bot_name: "nanobot",
+                bot_name: "dzeck",
                 bot_icon: "nb",
                 tool_hint_max_length: 40,
               },
@@ -906,13 +906,13 @@ describe("App layout", () => {
     fireEvent.click(within(sidebar).getByRole("button", { name: "Settings" }));
 
     expect(await screen.findByRole("heading", { name: "Overview" })).toBeInTheDocument();
-    expect(document.title).toBe("Settings · nanobot");
-    expect(screen.getByTestId("overview-nanobot-logo")).toBeInTheDocument();
+    expect(document.title).toBe("Settings · dzeck");
+    expect(screen.getByTestId("overview-dzeck-logo")).toBeInTheDocument();
     expect(screen.getByTestId("overview-logo-openai")).toBeInTheDocument();
     expect(screen.getByTestId("overview-logo-brave")).toBeInTheDocument();
     expect(screen.getByTestId("overview-logo-openrouter")).toBeInTheDocument();
-    expect(screen.queryByTestId("overview-logo-nanobot-gateway")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("overview-logo-nanobot-workspace")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("overview-logo-dzeck-gateway")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("overview-logo-dzeck-workspace")).not.toBeInTheDocument();
     expect(screen.queryByRole("navigation", { name: "Sidebar navigation" })).not.toBeInTheDocument();
     const settingsNav = screen.getByRole("navigation", { name: "Settings sections" });
     expect(settingsNav.className).toContain("overflow-x-auto");
@@ -1113,7 +1113,7 @@ describe("App layout", () => {
       "aria-current",
       "page",
     );
-    expect(document.title).toBe("Apps · nanobot");
+    expect(document.title).toBe("Apps · dzeck");
   });
 
   it("returns from settings to the blank start page when no session was active", async () => {
@@ -1154,7 +1154,7 @@ describe("App layout", () => {
                 temperature: 0.1,
                 reasoning_effort: null,
                 timezone: "UTC",
-                bot_name: "nanobot",
+                bot_name: "dzeck",
                 bot_icon: "nb",
                 tool_hint_max_length: 40,
               },
@@ -1250,13 +1250,13 @@ describe("App layout", () => {
     await waitFor(() => expect(connectSpy).toHaveBeenCalled());
     const sidebar = screen.getByRole("navigation", { name: "Sidebar navigation" });
     fireEvent.click(within(sidebar).getByRole("button", { name: "New chat" }));
-    await waitFor(() => expect(document.title).toBe("nanobot"));
+    await waitFor(() => expect(document.title).toBe("dzeck"));
 
     fireEvent.click(within(sidebar).getByRole("button", { name: "Settings" }));
     expect(await screen.findByRole("heading", { name: "Overview" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Back to chat" }));
 
-    await waitFor(() => expect(document.title).toBe("nanobot"));
+    await waitFor(() => expect(document.title).toBe("dzeck"));
     expect(screen.getByText(HERO_GREETING_PATTERN)).toBeInTheDocument();
   });
 

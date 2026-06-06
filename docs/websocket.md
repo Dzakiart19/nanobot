@@ -34,10 +34,10 @@ Add to `config.json` under `channels.websocket`:
 }
 ```
 
-### 2. Start nanobot
+### 2. Start Dzeck
 
 ```bash
-nanobot gateway
+Dzeck gateway
 ```
 
 You should see:
@@ -59,7 +59,7 @@ async def main():
     async with websockets.connect("ws://127.0.0.1:8765/?client_id=alice") as ws:
         ready = json.loads(await ws.recv())
         print(ready)  # {"event": "ready", "chat_id": "...", "client_id": "alice"}
-        await ws.send(json.dumps({"content": "Hello nanobot!"}))
+        await ws.send(json.dumps({"content": "Hello Dzeck!"}))
         reply = json.loads(await ws.recv())
         print(reply["text"])
 
@@ -180,11 +180,11 @@ Reasoning frames only flow when the channel's `showReasoning` is `true` (default
 **Legacy (default chat):** send a plain string, or a JSON object with a recognized text field:
 
 ```json
-"Hello nanobot!"
+"Hello Dzeck!"
 ```
 
 ```json
-{"content": "Hello nanobot!"}
+{"content": "Hello Dzeck!"}
 ```
 
 Recognized fields: `content`, `text`, `message` (checked in that order). Invalid JSON is treated as plain text. These frames route to the connection's default `chat_id` (the one announced in `ready`).
@@ -341,7 +341,7 @@ Legacy clients that only send plain text or `{"content": ...}` keep working unch
 
 ### Security boundary
 
-`chat_id` is a *capability*: anyone holding a valid WebSocket auth credential and the chat_id can attach to that conversation and see its output. This is safe for nanobot's local, single-user model. Multi-tenant deployments should namespace chat_ids per user (or introduce a per-tenant auth gate) — nanobot does not do this today.
+`chat_id` is a *capability*: anyone holding a valid WebSocket auth credential and the chat_id can attach to that conversation and see its output. This is safe for Dzeck's local, single-user model. Multi-tenant deployments should namespace chat_ids per user (or introduce a per-tenant auth gate) — Dzeck does not do this today.
 
 ## Security Notes
 
@@ -356,7 +356,7 @@ Legacy clients that only send plain text or `{"content": ...}` keep working unch
 Outbound `message` events may include a `media` field containing local filesystem paths. Remote clients cannot access these files directly — they need either:
 
 - A shared filesystem mount, or
-- An HTTP file server serving the nanobot media directory
+- An HTTP file server serving the Dzeck media directory
 
 ## Common Patterns
 

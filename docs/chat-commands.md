@@ -25,7 +25,7 @@ These commands work inside chat channels and interactive agent sessions:
 
 ## Pairing
 
-When someone sends a DM to the bot and isn't on the allowlist — whether it's a new user or an existing user on a new channel — nanobot automatically replies with a **pairing code** (like `ABCD-EFGH`) that expires in 10 minutes. To grant them access:
+When someone sends a DM to the bot and isn't on the allowlist — whether it's a new user or an existing user on a new channel — Dzeck automatically replies with a **pairing code** (like `ABCD-EFGH`) that expires in 10 minutes. To grant them access:
 
 ```text
 /pairing approve ABCD-EFGH
@@ -57,9 +57,9 @@ Preset names come from the top-level `modelPresets` config. Switching is runtime
 
 ## Periodic Tasks
 
-The gateway wakes up every 30 minutes and checks `HEARTBEAT.md` in your workspace (`~/.nanobot/workspace/HEARTBEAT.md`). If the file has tasks under `## Active Tasks`, the agent executes them and delivers results to your most recently active chat channel. If there are no active tasks, the heartbeat is skipped silently.
+The gateway wakes up every 30 minutes and checks `HEARTBEAT.md` in your workspace (`~/.Dzeck/workspace/HEARTBEAT.md`). If the file has tasks under `## Active Tasks`, the agent executes them and delivers results to your most recently active chat channel. If there are no active tasks, the heartbeat is skipped silently.
 
-**Setup:** edit `~/.nanobot/workspace/HEARTBEAT.md` (created automatically by `nanobot onboard`):
+**Setup:** edit `~/.Dzeck/workspace/HEARTBEAT.md` (created automatically by `Dzeck onboard`):
 
 ```markdown
 ## Active Tasks
@@ -70,4 +70,4 @@ The gateway wakes up every 30 minutes and checks `HEARTBEAT.md` in your workspac
 
 The agent can also manage this file itself — ask it to "add a periodic task" and it will update `HEARTBEAT.md` for you. Completed tasks should be deleted from the file, not moved to another section.
 
-> **Note:** The gateway must be running (`nanobot gateway`) and you must have chatted with the bot at least once so it knows which channel to deliver to.
+> **Note:** The gateway must be running (`Dzeck gateway`) and you must have chatted with the bot at least once so it knows which channel to deliver to.

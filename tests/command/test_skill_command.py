@@ -5,13 +5,13 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from nanobot.agent.loop import AgentLoop
-from nanobot.agent.skills import SkillsLoader
-from nanobot.bus.events import InboundMessage
-from nanobot.bus.queue import MessageBus
-from nanobot.command.builtin import cmd_skill, register_builtin_commands
-from nanobot.command.router import CommandContext, CommandRouter
-from nanobot.config.schema import ModelPresetConfig
+from dzeck.agent.loop import AgentLoop
+from dzeck.agent.skills import SkillsLoader
+from dzeck.bus.events import InboundMessage
+from dzeck.bus.queue import MessageBus
+from dzeck.command.builtin import cmd_skill, register_builtin_commands
+from dzeck.command.router import CommandContext, CommandRouter
+from dzeck.config.schema import ModelPresetConfig
 
 
 def _provider(default_model: str = "test-model") -> MagicMock:

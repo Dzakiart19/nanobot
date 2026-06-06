@@ -7,17 +7,17 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from nanobot.agent.loop import AgentLoop
-from nanobot.agent.tools.context import RequestContext
-from nanobot.agent.tools.long_task import (
+from dzeck.agent.loop import AgentLoop
+from dzeck.agent.tools.context import RequestContext
+from dzeck.agent.tools.long_task import (
     CompleteGoalTool,
     LongTaskTool,
 )
-from nanobot.bus.queue import MessageBus
-from nanobot.bus.runtime_events import RuntimeEventBus
-from nanobot.session.goal_state import GOAL_STATE_KEY
-from nanobot.session.manager import SessionManager
-from nanobot.session.webui_turns import WebuiTurnCoordinator
+from dzeck.bus.queue import MessageBus
+from dzeck.bus.runtime_events import RuntimeEventBus
+from dzeck.session.goal_state import GOAL_STATE_KEY
+from dzeck.session.manager import SessionManager
+from dzeck.session.webui_turns import WebuiTurnCoordinator
 
 
 def _tools(sm: SessionManager) -> tuple[LongTaskTool, CompleteGoalTool]:

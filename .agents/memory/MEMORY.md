@@ -1,1 +1,2 @@
-- [nanobot newChat timeout](nanobot-newchat-timeout.md) — newChat timer must start only after WS open, not at call time; guards new project "reset to home" bug
+- [dzeck newChat timeout](nanobot-newchat-timeout.md) — newChat timer must start only after WS open, not at call time; guards new project "reset to home" bug
+- [dzeck rebrand scope](dzeck-rebrand.md) — package renamed nanobot→dzeck; facade file is dzeck/dzeck.py with class Dzeck; auto-migration ~/.nanobot→~/.dzeck in loader.py

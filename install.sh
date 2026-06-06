@@ -40,16 +40,16 @@ echo "▶ [5/6] Installing root dependencies (e2e/ws/playwright)..."
 npm install -q
 echo "    ✓ root dependencies installed"
 
-# ── 6. Create nanobot config ──────────────────────────────────────────────────
-echo "▶ [6/6] Setting up Dzeck config (~/.nanobot/config.json)..."
-CONFIG_DIR="${HOME}/.nanobot"
+# ── 6. Create dzeck config ──────────────────────────────────────────────────
+echo "▶ [6/6] Setting up Dzeck config (~/.dzeck/config.json)..."
+CONFIG_DIR="${HOME}/.dzeck"
 CONFIG_FILE="${CONFIG_DIR}/config.json"
 mkdir -p "$CONFIG_DIR"
 
 python3 - <<'PYEOF'
 import json, os
 
-config_dir = os.path.expanduser("~/.nanobot")
+config_dir = os.path.expanduser("~/.dzeck")
 config_file = config_dir + "/config.json"
 os.makedirs(config_dir, exist_ok=True)
 
@@ -89,7 +89,7 @@ echo "╔═══════════════════════�
 echo "║  ✅ Dzeck siap dijalankan!                ║"
 echo "║                                          ║"
 echo "║  Jalankan project:                       ║"
-echo "║    Backend : nanobot gateway --port 8080 ║"
+echo "║    Backend : dzeck gateway --port 8080 ║"
 echo "║    Frontend: cd webui && npm run dev     ║"
 echo "║                                          ║"
 echo "║  Login password: admin123                ║"

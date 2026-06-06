@@ -1,35 +1,35 @@
 #!/usr/bin/env bash
 set -e
 
-# Remove stale non-editable nanobot install that overrides workspace source.
-# The editable .pth file (_editable_impl_nanobot_ai.pth) already points to
-# /home/runner/workspace, so a plain "nanobot" directory in site-packages
+# Remove stale non-editable dzeck install that overrides workspace source.
+# The editable .pth file (_editable_impl_dzeck_ai.pth) already points to
+# /home/runner/workspace, so a plain "dzeck" directory in site-packages
 # would shadow it and serve stale code.
 SITE_PKG="$HOME/workspace/.pythonlibs/lib/python3.11/site-packages"
-if [ -d "$SITE_PKG/nanobot" ]; then
-    echo "Removing stale nanobot install from site-packages..."
-    rm -rf "$SITE_PKG/nanobot"
+if [ -d "$SITE_PKG/dzeck" ]; then
+    echo "Removing stale dzeck install from site-packages..."
+    rm -rf "$SITE_PKG/dzeck"
 fi
 
-# Install Python package if nanobot command not found
-if ! command -v nanobot &> /dev/null; then
-    echo "Installing Dzeck engine (nanobot package)..."
+# Install Python package if dzeck command not found
+if ! command -v dzeck &> /dev/null; then
+    echo "Installing Dzeck engine (dzeck package)..."
     pip install -e . -q
     # After editable install, ensure no plain directory copy shadowed it
-    if [ -d "$SITE_PKG/nanobot" ]; then
-        rm -rf "$SITE_PKG/nanobot"
+    if [ -d "$SITE_PKG/dzeck" ]; then
+        rm -rf "$SITE_PKG/dzeck"
     fi
 fi
 
 # Create config using ${VAR} references so env vars are always the source of truth
-CONFIG_DIR="${HOME}/.nanobot"
+CONFIG_DIR="${HOME}/.dzeck"
 CONFIG_FILE="${CONFIG_DIR}/config.json"
 mkdir -p "$CONFIG_DIR"
 
 python3 - <<'PYEOF'
 import json, os
 
-config_dir = os.path.expanduser("~/.nanobot")
+config_dir = os.path.expanduser("~/.dzeck")
 config_file = config_dir + "/config.json"
 os.makedirs(config_dir, exist_ok=True)
 
@@ -63,7 +63,7 @@ with open(config_file, "w") as f:
 print("Config ready: apiKey=${NANOBOT_API_KEY}, apiBase=${NANOBOT_API_BASE}, model=${NANOBOT_MODEL}")
 
 # Write AGENTS.md — agent instructions (file delivery + workspace conventions)
-agents_md = os.path.expanduser("~/.nanobot/workspace/AGENTS.md")
+agents_md = os.path.expanduser("~/.dzeck/workspace/AGENTS.md")
 agents_content = """\
 # Agent Instructions
 
@@ -90,7 +90,7 @@ Any time you finish creating something the user will want to keep: code projects
 ## Scheduled Reminders
 
 Before scheduling reminders, check available skills and follow skill guidance first.
-Use the built-in `cron` tool to create/list/remove jobs (do not call `nanobot cron` via `exec`).
+Use the built-in `cron` tool to create/list/remove jobs (do not call `dzeck cron` via `exec`).
 Get USER_ID and CHANNEL from the current session (e.g., `8281248569` and `telegram` from `telegram:8281248569`).
 
 **Do NOT just write reminders to MEMORY.md** — that won't trigger actual notifications.
@@ -111,7 +111,7 @@ with open(agents_md, "w") as f:
 print("AGENTS.md written")
 
 # Write SOUL.md — persona + vision capability
-soul_md = os.path.expanduser("~/.nanobot/workspace/SOUL.md")
+soul_md = os.path.expanduser("~/.dzeck/workspace/SOUL.md")
 soul_content = """\
 # Soul
 

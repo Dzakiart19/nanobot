@@ -8,7 +8,7 @@ import {
   normalizeToolProgressEvents,
   toolTraceLinesFromEvents,
 } from "@/lib/tool-traces";
-import type { StreamError } from "@/lib/nanobot-client";
+import type { StreamError } from '@/lib/dzeck-client';
 import type {
   InboundEvent,
   OutboundCliAppMention,
@@ -380,7 +380,7 @@ export interface SendOptions {
   workspaceScope?: WorkspaceScopePayload | null;
 }
 
-export function useNanobotStream(
+export function useDzeckStream(
   chatId: string | null,
   initialMessages: UIMessage[] = [],
   hasPendingToolCalls = false,

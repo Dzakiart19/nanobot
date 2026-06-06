@@ -7,15 +7,15 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from nanobot.agent.hook import AgentHookContext
-from nanobot.agent.runner import AgentRunResult
-from nanobot.agent.subagent import (
+from dzeck.agent.hook import AgentHookContext
+from dzeck.agent.runner import AgentRunResult
+from dzeck.agent.subagent import (
     SubagentManager,
     SubagentStatus,
     _SubagentHook,
 )
-from nanobot.bus.queue import MessageBus
-from nanobot.providers.base import LLMProvider
+from dzeck.bus.queue import MessageBus
+from dzeck.providers.base import LLMProvider
 
 # ---------------------------------------------------------------------------
 # Helpers

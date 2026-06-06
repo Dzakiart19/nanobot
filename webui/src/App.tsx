@@ -25,7 +25,7 @@ import {
   saveSessionPassword,
 } from "@/lib/bootstrap";
 import { deriveTitle } from "@/lib/format";
-import { NanobotClient } from "@/lib/nanobot-client";
+import { DzeckClient } from '@/lib/dzeck-client';
 import { ClientProvider, useClient } from "@/providers/ClientProvider";
 import type {
   ChatSummary,
@@ -49,16 +49,16 @@ type BootState =
   | { status: "auth"; failed?: boolean }
   | {
       status: "ready";
-      client: NanobotClient;
+      client: DzeckClient;
       token: string;
       tokenExpiresAt: number;
       modelName: string | null;
       runtimeSurface: RuntimeSurface;
     };
 
-const SIDEBAR_STORAGE_KEY = "nanobot-webui.sidebar";
-const COMPLETED_RUNS_STORAGE_KEY = "nanobot-webui.sidebar.completed-runs.v1";
-const RESTART_STARTED_KEY = "nanobot-webui.restartStartedAt";
+const SIDEBAR_STORAGE_KEY = "dzeck-webui.sidebar";
+const COMPLETED_RUNS_STORAGE_KEY = "dzeck-webui.sidebar.completed-runs.v1";
+const RESTART_STARTED_KEY = "dzeck-webui.restartStartedAt";
 const SIDEBAR_WIDTH = 272;
 const SIDEBAR_RAIL_WIDTH = 56;
 const TOKEN_REFRESH_MARGIN_MS = 30_000;
@@ -401,7 +401,7 @@ export default function App() {
           const url = deriveWsUrl(boot.ws_path, boot.token, boot.ws_url);
           const runtimeSurface = toRuntimeSurface(boot.runtime_surface);
           const runtimeHost = createRuntimeHost(runtimeSurface, boot.runtime_capabilities);
-          const client = new NanobotClient({
+          const client = new DzeckClient({
             url,
             socketFactory: runtimeHost.socketFactory,
             onReauth: async () => {
@@ -481,7 +481,7 @@ export default function App() {
           const url = deriveWsUrl(boot.ws_path, boot.token, boot.ws_url);
           const runtimeSurface = toRuntimeSurface(boot.runtime_surface);
           const runtimeHost = createRuntimeHost(runtimeSurface, boot.runtime_capabilities);
-          const client = new NanobotClient({
+          const client = new DzeckClient({
             url,
             socketFactory: runtimeHost.socketFactory,
             onReauth: async () => {

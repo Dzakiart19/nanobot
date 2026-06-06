@@ -1,12 +1,12 @@
 import pytest
 
-from nanobot.pairing import __all__ as pairing_all
-from nanobot.pairing import store
+from dzeck.pairing import __all__ as pairing_all
+from dzeck.pairing import store
 
 
 def test_all_exports_are_importable():
-    """Every name in __all__ must actually be importable from nanobot.pairing."""
-    import nanobot.pairing as pkg
+    """Every name in __all__ must actually be importable from dzeck.pairing."""
+    import dzeck.pairing as pkg
 
     for name in pairing_all:
         assert hasattr(pkg, name), f"{name} is in __all__ but not exported"

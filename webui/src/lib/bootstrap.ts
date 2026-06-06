@@ -1,9 +1,9 @@
 import type { BootstrapResponse } from "./types";
 import { fetchWithTimeout } from "./http";
 
-const SECRET_STORAGE_KEY = "nanobot-webui.bootstrap-secret";
-const EMAIL_STORAGE_KEY = "nanobot-webui.user-email";
-const PASSWORD_SESSION_KEY = "nanobot-webui.session-password";
+const SECRET_STORAGE_KEY = "dzeck-webui.bootstrap-secret";
+const EMAIL_STORAGE_KEY = "dzeck-webui.user-email";
+const PASSWORD_SESSION_KEY = "dzeck-webui.session-password";
 
 /** Read a previously saved bootstrap secret from localStorage. */
 export function loadSavedSecret(): string {
@@ -185,7 +185,7 @@ export function deriveWsUrl(
   wsUrl?: string | null,
 ): string {
   const query = `?token=${encodeURIComponent(token)}`;
-  if (wsUrl && /^(wss?|nanobot-host):\/\//i.test(wsUrl)) {
+  if (wsUrl && /^(wss?|dzeck-host):\/\//i.test(wsUrl)) {
     const isServerLocalhost = /^wss?:\/\/(127\.0\.0\.1|localhost)(:\d+)?\//i.test(wsUrl);
     if (!isServerLocalhost) {
       const join = wsUrl.includes("?") ? "&" : "?";

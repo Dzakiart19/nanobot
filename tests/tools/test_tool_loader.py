@@ -6,9 +6,9 @@ from pathlib import Path
 from typing import Any
 from unittest.mock import MagicMock
 
-from nanobot.agent.tools.base import Tool
-from nanobot.agent.tools.context import ToolContext
-from nanobot.agent.tools.loader import _SKIP_MODULES, ToolLoader
+from dzeck.agent.tools.base import Tool
+from dzeck.agent.tools.context import ToolContext
+from dzeck.agent.tools.loader import _SKIP_MODULES, ToolLoader
 
 
 class _MinimalTool(Tool):
@@ -116,8 +116,8 @@ def test_loader_registers_exec_with_real_tools_config(tmp_path):
     """Real config objects catch bad ctx.config attribute paths that mocks hide."""
     from types import SimpleNamespace
 
-    from nanobot.agent.tools.registry import ToolRegistry
-    from nanobot.config.schema import ToolsConfig
+    from dzeck.agent.tools.registry import ToolRegistry
+    from dzeck.config.schema import ToolsConfig
 
     ctx = ToolContext(
         config=ToolsConfig(),
@@ -141,7 +141,7 @@ def test_loader_registers_exec_with_real_tools_config(tmp_path):
 
 
 def test_fs_tool_create_builds_from_context():
-    from nanobot.agent.tools.filesystem import ReadFileTool
+    from dzeck.agent.tools.filesystem import ReadFileTool
     mock_config = MagicMock()
     mock_config.restrict_to_workspace = False
     mock_config.exec.sandbox = ""
@@ -152,7 +152,7 @@ def test_fs_tool_create_builds_from_context():
 
 
 def test_fs_tool_create_respects_restrict_to_workspace():
-    from nanobot.agent.tools.filesystem import ReadFileTool
+    from dzeck.agent.tools.filesystem import ReadFileTool
     mock_config = MagicMock()
     mock_config.restrict_to_workspace = True
     mock_config.exec.sandbox = ""
@@ -162,7 +162,7 @@ def test_fs_tool_create_respects_restrict_to_workspace():
 
 
 def test_fs_tool_create_respects_sandbox():
-    from nanobot.agent.tools.filesystem import ReadFileTool
+    from dzeck.agent.tools.filesystem import ReadFileTool
     mock_config = MagicMock()
     mock_config.restrict_to_workspace = False
     mock_config.exec.sandbox = "bwrap"
@@ -175,7 +175,7 @@ def test_fs_tool_create_respects_sandbox():
 
 
 async def test_message_tool_create():
-    from nanobot.agent.tools.message import MessageTool
+    from dzeck.agent.tools.message import MessageTool
     mock_bus = MagicMock()
     mock_config = MagicMock()
     ctx = ToolContext(config=mock_config, workspace="/tmp", bus=mock_bus)
@@ -184,7 +184,7 @@ async def test_message_tool_create():
 
 
 def test_spawn_tool_create():
-    from nanobot.agent.tools.spawn import SpawnTool
+    from dzeck.agent.tools.spawn import SpawnTool
     mock_mgr = MagicMock()
     mock_config = MagicMock()
     ctx = ToolContext(config=mock_config, workspace="/tmp", subagent_manager=mock_mgr)
@@ -193,14 +193,14 @@ def test_spawn_tool_create():
 
 
 def test_cron_tool_enabled_without_service():
-    from nanobot.agent.tools.cron import CronTool
+    from dzeck.agent.tools.cron import CronTool
     mock_config = MagicMock()
     ctx = ToolContext(config=mock_config, workspace="/tmp", cron_service=None)
     assert CronTool.enabled(ctx) is False
 
 
 def test_cron_tool_enabled_with_service():
-    from nanobot.agent.tools.cron import CronTool
+    from dzeck.agent.tools.cron import CronTool
     mock_service = MagicMock()
     mock_config = MagicMock()
     ctx = ToolContext(config=mock_config, workspace="/tmp", cron_service=mock_service)
@@ -208,7 +208,7 @@ def test_cron_tool_enabled_with_service():
 
 
 def test_cron_tool_create():
-    from nanobot.agent.tools.cron import CronTool
+    from dzeck.agent.tools.cron import CronTool
     mock_service = MagicMock()
     mock_config = MagicMock()
     ctx = ToolContext(
@@ -223,13 +223,13 @@ def test_cron_tool_create():
 
 
 def test_exec_tool_config_cls():
-    from nanobot.agent.tools.shell import ExecTool, ExecToolConfig
+    from dzeck.agent.tools.shell import ExecTool, ExecToolConfig
     assert ExecTool.config_cls() is ExecToolConfig
     assert ExecTool.config_key == "exec"
 
 
 def test_exec_tool_enabled():
-    from nanobot.agent.tools.shell import ExecTool
+    from dzeck.agent.tools.shell import ExecTool
     mock_config = MagicMock()
     mock_config.exec.enable = True
     ctx = ToolContext(config=mock_config, workspace="/tmp")
@@ -239,7 +239,7 @@ def test_exec_tool_enabled():
 
 
 def test_exec_tool_create():
-    from nanobot.agent.tools.shell import ExecTool
+    from dzeck.agent.tools.shell import ExecTool
     mock_config = MagicMock()
     mock_config.exec.enable = True
     mock_config.exec.timeout = 120
@@ -255,7 +255,7 @@ def test_exec_tool_create():
 
 
 def test_web_tools_config_cls():
-    from nanobot.agent.tools.web import WebFetchTool, WebSearchTool, WebToolsConfig
+    from dzeck.agent.tools.web import WebFetchTool, WebSearchTool, WebToolsConfig
     assert WebSearchTool.config_key == "web"
     assert WebSearchTool.config_cls() is WebToolsConfig
     assert WebFetchTool.config_key == "web"
@@ -263,7 +263,7 @@ def test_web_tools_config_cls():
 
 
 def test_web_tools_enabled():
-    from nanobot.agent.tools.web import WebSearchTool
+    from dzeck.agent.tools.web import WebSearchTool
     mock_config = MagicMock()
     mock_config.web.enable = True
     ctx = ToolContext(config=mock_config, workspace="/tmp")
@@ -273,7 +273,7 @@ def test_web_tools_enabled():
 
 
 def test_web_search_tool_create():
-    from nanobot.agent.tools.web import WebSearchTool
+    from dzeck.agent.tools.web import WebSearchTool
     mock_config = MagicMock()
     mock_config.web.enable = True
     mock_config.web.search = MagicMock()
@@ -285,7 +285,7 @@ def test_web_search_tool_create():
 
 
 def test_web_fetch_tool_create():
-    from nanobot.agent.tools.web import WebFetchTool
+    from dzeck.agent.tools.web import WebFetchTool
     mock_config = MagicMock()
     mock_config.web.enable = True
     mock_config.web.fetch = MagicMock()
@@ -297,13 +297,13 @@ def test_web_fetch_tool_create():
 
 
 def test_image_gen_tool_config_cls():
-    from nanobot.agent.tools.image_generation import ImageGenerationTool, ImageGenerationToolConfig
+    from dzeck.agent.tools.image_generation import ImageGenerationTool, ImageGenerationToolConfig
     assert ImageGenerationTool.config_key == "image_generation"
     assert ImageGenerationTool.config_cls() is ImageGenerationToolConfig
 
 
 def test_image_gen_tool_enabled():
-    from nanobot.agent.tools.image_generation import ImageGenerationTool
+    from dzeck.agent.tools.image_generation import ImageGenerationTool
     mock_config = MagicMock()
     mock_config.image_generation.enabled = True
     ctx = ToolContext(config=mock_config, workspace="/tmp")
@@ -313,7 +313,7 @@ def test_image_gen_tool_enabled():
 
 
 def test_image_gen_tool_create():
-    from nanobot.agent.tools.image_generation import ImageGenerationTool
+    from dzeck.agent.tools.image_generation import ImageGenerationTool
     mock_config = MagicMock()
     mock_config.image_generation = MagicMock()
     ctx = ToolContext(
@@ -328,13 +328,13 @@ def test_image_gen_tool_create():
 
 
 def test_my_tool_config_cls():
-    from nanobot.agent.tools.self import MyTool, MyToolConfig
+    from dzeck.agent.tools.self import MyTool, MyToolConfig
     assert MyTool.config_key == "my"
     assert MyTool.config_cls() is MyToolConfig
 
 
 def test_my_tool_enabled():
-    from nanobot.agent.tools.self import MyTool
+    from dzeck.agent.tools.self import MyTool
     mock_config = MagicMock()
     mock_config.my.enable = True
     ctx = ToolContext(config=mock_config, workspace="/tmp")
@@ -344,7 +344,7 @@ def test_my_tool_enabled():
 
 
 def test_mcp_wrappers_not_discoverable():
-    from nanobot.agent.tools.mcp import MCPPromptWrapper, MCPResourceWrapper, MCPToolWrapper
+    from dzeck.agent.tools.mcp import MCPPromptWrapper, MCPResourceWrapper, MCPToolWrapper
     assert MCPToolWrapper._plugin_discoverable is False
     assert MCPResourceWrapper._plugin_discoverable is False
     assert MCPPromptWrapper._plugin_discoverable is False
@@ -355,7 +355,7 @@ def test_mcp_wrappers_not_discoverable():
 
 def test_config_round_trip():
     """Verify config serialization is unchanged after moving config classes."""
-    from nanobot.config.schema import Config
+    from dzeck.config.schema import Config
 
     config_dict = {
         "tools": {
@@ -377,7 +377,7 @@ def test_config_round_trip():
 
 def test_config_defaults():
     """Verify default values match the original hardcoded schema."""
-    from nanobot.config.schema import Config
+    from dzeck.config.schema import Config
 
     config = Config.model_validate({})
     assert config.tools.exec.enable is True
@@ -396,8 +396,8 @@ def test_config_defaults():
 
 def test_loader_registers_same_tools_as_old_hardcoded():
     """Verify the loader produces the same tool set as the old _register_default_tools."""
-    from nanobot.agent.tools.loader import ToolLoader
-    from nanobot.agent.tools.registry import ToolRegistry
+    from dzeck.agent.tools.loader import ToolLoader
+    from dzeck.agent.tools.registry import ToolRegistry
 
     mock_config = MagicMock()
     mock_config.exec.enable = True

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-CONFIG_DIR="${NANOBOT_CONFIG_DIR:-$HOME/.nanobot}"
+CONFIG_DIR="${DZECK_CONFIG_DIR:-$HOME/.dzeck}"
 CONFIG_FILE="$CONFIG_DIR/config.json"
 
 mkdir -p "$CONFIG_DIR"
@@ -9,7 +9,7 @@ mkdir -p "$CONFIG_DIR"
 python3 - <<'PYEOF'
 import json, os, sys
 
-config_file = os.environ.get("NANOBOT_CONFIG_DIR", os.path.expanduser("~/.nanobot")) + "/config.json"
+config_file = os.environ.get("DZECK_CONFIG_DIR", os.path.expanduser("~/.dzeck")) + "/config.json"
 
 if os.path.exists(config_file):
     with open(config_file) as f:
@@ -47,4 +47,4 @@ with open(config_file, "w") as f:
 print(f"Production config written → port 5000, model {model}", flush=True)
 PYEOF
 
-exec nanobot gateway --port 8080
+exec dzeck gateway --port 8080

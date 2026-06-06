@@ -3,10 +3,10 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from nanobot.agent.loop import AgentLoop
-from nanobot.bus.queue import MessageBus
-from nanobot.providers.base import LLMResponse, ToolCallRequest
-from nanobot.agent.tools.context import RequestContext
+from dzeck.agent.loop import AgentLoop
+from dzeck.bus.queue import MessageBus
+from dzeck.providers.base import LLMResponse, ToolCallRequest
+from dzeck.agent.tools.context import RequestContext
 
 
 class _ContextRecordingTool:

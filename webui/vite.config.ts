@@ -4,7 +4,7 @@ import path from "node:path";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  const target = env.NANOBOT_API_URL ?? "http://127.0.0.1:8081";
+  const target = env.DZECK_API_URL ?? "http://127.0.0.1:8081";
 
   return {
     plugins: [react()],
@@ -17,7 +17,7 @@ export default defineConfig(({ mode }) => {
       exclude: ["@radix-ui/react-dialog"],
     },
     build: {
-      outDir: path.resolve(__dirname, "../nanobot/web/dist"),
+      outDir: path.resolve(__dirname, "../dzeck/web/dist"),
       emptyOutDir: true,
       sourcemap: false,
       rollupOptions: {

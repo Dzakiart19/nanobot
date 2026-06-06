@@ -6,8 +6,8 @@ import shlex
 import subprocess
 import sys
 
-from nanobot.agent.tools.shell import ExecTool
-from nanobot.agent.tools.exec_session import ExecSessionManager, ListExecSessionsTool, WriteStdinTool
+from dzeck.agent.tools.shell import ExecTool
+from dzeck.agent.tools.exec_session import ExecSessionManager, ListExecSessionsTool, WriteStdinTool
 
 
 def _python_command(code: str) -> str:

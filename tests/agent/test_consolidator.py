@@ -4,14 +4,14 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from nanobot.agent.memory import (
+from dzeck.agent.memory import (
     _ARCHIVE_SUMMARY_MAX_CHARS,
     Consolidator,
     MemoryStore,
 )
-from nanobot.providers.base import LLMResponse
-from nanobot.session.manager import Session
-from nanobot.utils.prompt_templates import render_template
+from dzeck.providers.base import LLMResponse
+from dzeck.session.manager import Session
+from dzeck.utils.prompt_templates import render_template
 
 
 @pytest.fixture
@@ -331,7 +331,7 @@ class TestCompactIdleSession:
     @pytest.fixture
     def real_consolidator(self, store, mock_provider):
         """Create a Consolidator with a real SessionManager (not a mock)."""
-        from nanobot.session.manager import SessionManager
+        from dzeck.session.manager import SessionManager
 
         sessions = SessionManager(store.workspace)
         return Consolidator(
@@ -533,8 +533,8 @@ class TestConsolidatorSessionRefresh:
     @pytest.mark.asyncio
     async def test_reloads_before_empty_session_guard(self, tmp_path):
         """A stale empty reference must not skip a non-empty cached session."""
-        from nanobot.agent.memory import Consolidator, MemoryStore
-        from nanobot.session.manager import Session, SessionManager
+        from dzeck.agent.memory import Consolidator, MemoryStore
+        from dzeck.session.manager import Session, SessionManager
 
         store = MemoryStore(tmp_path)
         provider = MagicMock()
@@ -576,8 +576,8 @@ class TestConsolidatorSessionRefresh:
         """After compact_idle_session replaces the session, a concurrent
         maybe_consolidate_by_tokens with the old reference should use the
         fresh session from cache instead of overwriting."""
-        from nanobot.agent.memory import Consolidator, MemoryStore
-        from nanobot.session.manager import SessionManager
+        from dzeck.agent.memory import Consolidator, MemoryStore
+        from dzeck.session.manager import SessionManager
 
         store = MemoryStore(tmp_path)
         provider = MagicMock()

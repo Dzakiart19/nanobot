@@ -5,10 +5,10 @@ import json
 import httpx
 import pytest
 
-from nanobot.config.loader import load_config, save_config
-from nanobot.config.schema import Config, ModelPresetConfig
-from nanobot.providers.registry import find_by_name
-from nanobot.webui.settings_api import (
+from dzeck.config.loader import load_config, save_config
+from dzeck.config.schema import Config, ModelPresetConfig
+from dzeck.providers.registry import find_by_name
+from dzeck.webui.settings_api import (
     WebUISettingsError,
     _oauth_provider_status,
     create_model_configuration,
@@ -30,7 +30,7 @@ def test_create_model_configuration_writes_label_and_selects(
     config.agents.defaults.provider = "openai"
     config.providers.openai.api_key = "sk-test"
     save_config(config, config_path)
-    monkeypatch.setattr("nanobot.config.loader._current_config_path", config_path)
+    monkeypatch.setattr("dzeck.config.loader._current_config_path", config_path)
 
     payload = create_model_configuration(
         {
@@ -68,7 +68,7 @@ def test_create_model_configuration_rejects_unconfigured_provider(
 ) -> None:
     config_path = tmp_path / "config.json"
     save_config(Config(), config_path)
-    monkeypatch.setattr("nanobot.config.loader._current_config_path", config_path)
+    monkeypatch.setattr("dzeck.config.loader._current_config_path", config_path)
 
     with pytest.raises(WebUISettingsError, match="provider is not configured"):
         create_model_configuration(
@@ -93,9 +93,9 @@ def test_update_model_configuration_edits_named_preset_and_selects(
         model="openai/gpt-4.1",
     )
     save_config(config, config_path)
-    monkeypatch.setattr("nanobot.config.loader._current_config_path", config_path)
+    monkeypatch.setattr("dzeck.config.loader._current_config_path", config_path)
     monkeypatch.setattr(
-        "nanobot.webui.settings_api._oauth_provider_status",
+        "dzeck.webui.settings_api._oauth_provider_status",
         lambda spec: {
             "configured": spec.name == "openai_codex",
             "account": "acct-test",
@@ -129,7 +129,7 @@ def test_update_agent_settings_accepts_context_window_options(
     config_path = tmp_path / "config.json"
     config = Config()
     save_config(config, config_path)
-    monkeypatch.setattr("nanobot.config.loader._current_config_path", config_path)
+    monkeypatch.setattr("dzeck.config.loader._current_config_path", config_path)
 
     payload = update_agent_settings({"context_window_tokens": ["262144"]})
 
@@ -150,7 +150,7 @@ def test_update_model_configuration_accepts_context_window_options(
         model="openai/gpt-4.1",
     )
     save_config(config, config_path)
-    monkeypatch.setattr("nanobot.config.loader._current_config_path", config_path)
+    monkeypatch.setattr("dzeck.config.loader._current_config_path", config_path)
 
     payload = update_model_configuration(
         {
@@ -170,7 +170,7 @@ def test_update_context_window_rejects_unknown_values(
 ) -> None:
     config_path = tmp_path / "config.json"
     save_config(Config(), config_path)
-    monkeypatch.setattr("nanobot.config.loader._current_config_path", config_path)
+    monkeypatch.setattr("dzeck.config.loader._current_config_path", config_path)
 
     with pytest.raises(WebUISettingsError, match="context_window_tokens must be 65536 or 262144"):
         update_agent_settings({"context_window_tokens": ["128000"]})
@@ -182,7 +182,7 @@ def test_update_model_configuration_rejects_default_preset(
 ) -> None:
     config_path = tmp_path / "config.json"
     save_config(Config(), config_path)
-    monkeypatch.setattr("nanobot.config.loader._current_config_path", config_path)
+    monkeypatch.setattr("dzeck.config.loader._current_config_path", config_path)
 
     with pytest.raises(WebUISettingsError, match="model configuration is required"):
         update_model_configuration({"name": ["default"], "model": ["openai/gpt-4.1"]})
@@ -194,7 +194,7 @@ def test_settings_payload_includes_oauth_provider_status(
 ) -> None:
     config_path = tmp_path / "config.json"
     save_config(Config(), config_path)
-    monkeypatch.setattr("nanobot.config.loader._current_config_path", config_path)
+    monkeypatch.setattr("dzeck.config.loader._current_config_path", config_path)
 
     def fake_oauth_status(spec):
         if spec.name == "openai_codex":
@@ -211,7 +211,7 @@ def test_settings_payload_includes_oauth_provider_status(
             "login_supported": True,
         }
 
-    monkeypatch.setattr("nanobot.webui.settings_api._oauth_provider_status", fake_oauth_status)
+    monkeypatch.setattr("dzeck.webui.settings_api._oauth_provider_status", fake_oauth_status)
 
     payload = settings_payload()
     providers = {row["name"]: row for row in payload["providers"]}
@@ -230,8 +230,8 @@ def test_settings_payload_includes_network_safety_fields(
     config.tools.webui_allow_local_service_access = False
     config.tools.ssrf_whitelist = ["100.64.0.0/10"]
     save_config(config, config_path)
-    monkeypatch.setattr("nanobot.config.loader._current_config_path", config_path)
-    monkeypatch.setattr("nanobot.webui.workspaces.get_webui_dir", lambda: tmp_path / "webui")
+    monkeypatch.setattr("dzeck.config.loader._current_config_path", config_path)
+    monkeypatch.setattr("dzeck.webui.workspaces.get_webui_dir", lambda: tmp_path / "webui")
 
     payload = settings_payload()
 
@@ -248,8 +248,8 @@ def test_update_network_safety_settings_writes_local_service_flag(
 ) -> None:
     config_path = tmp_path / "config.json"
     save_config(Config(), config_path)
-    monkeypatch.setattr("nanobot.config.loader._current_config_path", config_path)
-    monkeypatch.setattr("nanobot.webui.workspaces.get_webui_dir", lambda: tmp_path / "webui")
+    monkeypatch.setattr("dzeck.config.loader._current_config_path", config_path)
+    monkeypatch.setattr("dzeck.webui.workspaces.get_webui_dir", lambda: tmp_path / "webui")
 
     payload = update_network_safety_settings(
         {
@@ -274,8 +274,8 @@ def test_update_network_safety_settings_accepts_legacy_restricted_default_access
 ) -> None:
     config_path = tmp_path / "config.json"
     save_config(Config(), config_path)
-    monkeypatch.setattr("nanobot.config.loader._current_config_path", config_path)
-    monkeypatch.setattr("nanobot.webui.workspaces.get_webui_dir", lambda: tmp_path / "webui")
+    monkeypatch.setattr("dzeck.config.loader._current_config_path", config_path)
+    monkeypatch.setattr("dzeck.webui.workspaces.get_webui_dir", lambda: tmp_path / "webui")
 
     payload = update_network_safety_settings({"webui_default_access_mode": ["restricted"]})
 
@@ -289,8 +289,8 @@ def test_update_network_safety_settings_default_access_is_webui_only(
     config_path = tmp_path / "config.json"
     save_config(Config(), config_path)
     before = config_path.read_text(encoding="utf-8")
-    monkeypatch.setattr("nanobot.config.loader._current_config_path", config_path)
-    monkeypatch.setattr("nanobot.webui.workspaces.get_webui_dir", lambda: tmp_path / "webui")
+    monkeypatch.setattr("dzeck.config.loader._current_config_path", config_path)
+    monkeypatch.setattr("dzeck.webui.workspaces.get_webui_dir", lambda: tmp_path / "webui")
 
     payload = update_network_safety_settings({"webui_default_access_mode": ["full"]})
 
@@ -346,7 +346,7 @@ def test_provider_models_payload_fetches_openai_compatible_models(
     config = Config()
     config.providers.deepseek.api_key = "sk-test"
     save_config(config, config_path)
-    monkeypatch.setattr("nanobot.config.loader._current_config_path", config_path)
+    monkeypatch.setattr("dzeck.config.loader._current_config_path", config_path)
 
     def fake_get(url: str, **kwargs):
         assert url == "https://api.deepseek.com/models"
@@ -362,7 +362,7 @@ def test_provider_models_payload_fetches_openai_compatible_models(
             request=httpx.Request("GET", url),
         )
 
-    monkeypatch.setattr("nanobot.webui.settings_api.httpx.get", fake_get)
+    monkeypatch.setattr("dzeck.webui.settings_api.httpx.get", fake_get)
 
     payload = provider_models_payload({"provider": ["deepseek"]})
 
@@ -391,7 +391,7 @@ def test_provider_models_payload_fetches_minimax_anthropic_models(
     config.providers.minimax_anthropic.api_key = "sk-test"
     config.providers.minimax_anthropic.api_base = api_base
     save_config(config, config_path)
-    monkeypatch.setattr("nanobot.config.loader._current_config_path", config_path)
+    monkeypatch.setattr("dzeck.config.loader._current_config_path", config_path)
 
     def fake_get(url: str, **kwargs):
         assert url == expected_url
@@ -403,7 +403,7 @@ def test_provider_models_payload_fetches_minimax_anthropic_models(
             request=httpx.Request("GET", url),
         )
 
-    monkeypatch.setattr("nanobot.webui.settings_api.httpx.get", fake_get)
+    monkeypatch.setattr("dzeck.webui.settings_api.httpx.get", fake_get)
 
     payload = provider_models_payload({"provider": ["minimax_anthropic"]})
 
@@ -425,7 +425,7 @@ def test_provider_models_payload_requires_gateway_key(
 ) -> None:
     config_path = tmp_path / "config.json"
     save_config(Config(), config_path)
-    monkeypatch.setattr("nanobot.config.loader._current_config_path", config_path)
+    monkeypatch.setattr("dzeck.config.loader._current_config_path", config_path)
 
     payload = provider_models_payload({"provider": ["openrouter"]})
 
@@ -439,9 +439,9 @@ def test_create_model_configuration_accepts_configured_oauth_provider(
 ) -> None:
     config_path = tmp_path / "config.json"
     save_config(Config(), config_path)
-    monkeypatch.setattr("nanobot.config.loader._current_config_path", config_path)
+    monkeypatch.setattr("dzeck.config.loader._current_config_path", config_path)
     monkeypatch.setattr(
-        "nanobot.webui.settings_api._oauth_provider_status",
+        "dzeck.webui.settings_api._oauth_provider_status",
         lambda spec: {
             "configured": spec.name == "openai_codex",
             "account": "acct-test",
@@ -478,7 +478,7 @@ def test_settings_payload_azure_openai_with_api_key_is_configured(
     config.providers.azure_openai.api_key = "k"
     config.providers.azure_openai.api_base = "https://r.openai.azure.com"
     save_config(config, config_path)
-    monkeypatch.setattr("nanobot.config.loader._current_config_path", config_path)
+    monkeypatch.setattr("dzeck.config.loader._current_config_path", config_path)
 
     payload = settings_payload()
     azure = next(row for row in payload["providers"] if row["name"] == "azure_openai")
@@ -498,7 +498,7 @@ def test_settings_payload_azure_openai_aad_mode_is_configured(
     config = Config()
     config.providers.azure_openai.api_base = "https://r.openai.azure.com"
     save_config(config, config_path)
-    monkeypatch.setattr("nanobot.config.loader._current_config_path", config_path)
+    monkeypatch.setattr("dzeck.config.loader._current_config_path", config_path)
 
     payload = settings_payload()
     azure = next(row for row in payload["providers"] if row["name"] == "azure_openai")
@@ -518,7 +518,7 @@ def test_settings_payload_azure_openai_missing_base_not_configured(
     config = Config()
     config.providers.azure_openai.api_key = "k"
     save_config(config, config_path)
-    monkeypatch.setattr("nanobot.config.loader._current_config_path", config_path)
+    monkeypatch.setattr("dzeck.config.loader._current_config_path", config_path)
 
     payload = settings_payload()
     azure = next(row for row in payload["providers"] if row["name"] == "azure_openai")
@@ -535,7 +535,7 @@ def test_create_model_configuration_accepts_azure_openai_aad_mode(
     config = Config()
     config.providers.azure_openai.api_base = "https://r.openai.azure.com"
     save_config(config, config_path)
-    monkeypatch.setattr("nanobot.config.loader._current_config_path", config_path)
+    monkeypatch.setattr("dzeck.config.loader._current_config_path", config_path)
 
     payload = create_model_configuration(
         {
@@ -558,7 +558,7 @@ def test_create_model_configuration_rejects_azure_openai_without_base(
     """azure_openai without api_base must still be rejected as not configured."""
     config_path = tmp_path / "config.json"
     save_config(Config(), config_path)
-    monkeypatch.setattr("nanobot.config.loader._current_config_path", config_path)
+    monkeypatch.setattr("dzeck.config.loader._current_config_path", config_path)
 
     with pytest.raises(WebUISettingsError, match="provider is not configured"):
         create_model_configuration(
@@ -572,7 +572,7 @@ def test_create_model_configuration_rejects_azure_openai_without_base(
 
 def test_azure_openai_spec_no_longer_requires_api_key() -> None:
     """Contract guard: api_key is optional for azure_openai (AAD fallback)."""
-    from nanobot.webui.settings_api import _provider_requires_api_key
+    from dzeck.webui.settings_api import _provider_requires_api_key
 
     spec = find_by_name("azure_openai")
     assert spec is not None
