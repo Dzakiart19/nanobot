@@ -35,13 +35,13 @@ if api_key and api_base:
     config.setdefault("agents", {}).setdefault("defaults", {})["provider"] = "custom"
     config.setdefault("agents", {}).setdefault("defaults", {})["model"] = model
 
-token_secret = secrets.token_urlsafe(32)
+password = os.environ.get("NANOBOT_PASSWORD", "admin123")
 ws = config.setdefault("channels", {}).setdefault("websocket", {})
 ws["enabled"] = True
 ws["host"]    = "0.0.0.0"
 ws["port"]    = 8081
 ws["path"]    = "/ws"
-ws["tokenIssueSecret"] = token_secret
+ws["tokenIssueSecret"] = password
 
 with open(config_file, "w") as f:
     json.dump(config, f, indent=2)

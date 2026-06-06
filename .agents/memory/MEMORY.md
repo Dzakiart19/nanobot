@@ -1,0 +1,1 @@
+- [nanobot newChat timeout](nanobot-newchat-timeout.md) — newChat timer must start only after WS open, not at call time; guards new project "reset to home" bug

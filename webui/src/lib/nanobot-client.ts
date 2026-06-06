@@ -92,7 +92,8 @@ type ErrorHandler = (error: StreamError) => void;
 interface PendingNewChat {
   resolve: (chatId: string) => void;
   reject: (err: Error) => void;
-  timer: ReturnType<typeof setTimeout>;
+  timer: ReturnType<typeof setTimeout> | null;
+  timeoutMs: number;
 }
 
 export interface NanobotClientOptions {
@@ -303,16 +304,25 @@ export class NanobotClient {
   }
 
   /** Ask the server to provision a new chat_id; resolves with the assigned id. */
-  newChat(timeoutMs: number = 5_000, workspaceScope?: WorkspaceScopePayload | null): Promise<string> {
+  newChat(timeoutMs: number = 15_000, workspaceScope?: WorkspaceScopePayload | null): Promise<string> {
     if (this.pendingNewChat) {
       return Promise.reject(new Error("newChat already in flight"));
     }
     return new Promise<string>((resolve, reject) => {
-      const timer = setTimeout(() => {
-        this.pendingNewChat = null;
-        reject(new Error("newChat timed out"));
-      }, timeoutMs);
-      this.pendingNewChat = { resolve, reject, timer };
+      const isOpen = this.socket?.readyState === WS_OPEN;
+      const pending: PendingNewChat = {
+        resolve,
+        reject,
+        timer: null,
+        timeoutMs,
+      };
+      if (isOpen) {
+        pending.timer = setTimeout(() => {
+          this.pendingNewChat = null;
+          reject(new Error("newChat timed out"));
+        }, timeoutMs);
+      }
+      this.pendingNewChat = pending;
       this.queueSend({
         type: "new_chat",
         ...(workspaceScope ? { workspace_scope: workspaceScope } : {}),
@@ -380,6 +390,14 @@ export class NanobotClient {
     // Flush anything queued during reconnect.
     const queued = this.sendQueue.splice(0);
     for (const frame of queued) this.rawSend(frame);
+    // Start the newChat timeout now that the frame has been sent.
+    if (this.pendingNewChat && !this.pendingNewChat.timer) {
+      const pending = this.pendingNewChat;
+      pending.timer = setTimeout(() => {
+        this.pendingNewChat = null;
+        pending.reject(new Error("newChat timed out"));
+      }, pending.timeoutMs);
+    }
   }
 
   private handleMessage(ev: MessageEvent): void {
@@ -410,7 +428,7 @@ export class NanobotClient {
     if (parsed.event === "attached") {
       this.knownChats.add(parsed.chat_id);
       if (this.pendingNewChat) {
-        clearTimeout(this.pendingNewChat.timer);
+        if (this.pendingNewChat.timer !== null) clearTimeout(this.pendingNewChat.timer);
         this.pendingNewChat.resolve(parsed.chat_id);
         this.pendingNewChat = null;
       }
@@ -435,7 +453,7 @@ export class NanobotClient {
         chatId: parsed.chat_id,
       });
       if (this.pendingNewChat) {
-        clearTimeout(this.pendingNewChat.timer);
+        if (this.pendingNewChat.timer !== null) clearTimeout(this.pendingNewChat.timer);
         this.pendingNewChat.reject(new Error(`workspace_scope_rejected:${parsed.reason || ""}`));
         this.pendingNewChat = null;
       }
@@ -494,7 +512,7 @@ export class NanobotClient {
   private handleClose(event?: { code?: number }): void {
     this.socket = null;
     if (this.pendingNewChat) {
-      clearTimeout(this.pendingNewChat.timer);
+      if (this.pendingNewChat.timer !== null) clearTimeout(this.pendingNewChat.timer);
       this.pendingNewChat.reject(new Error("socket closed"));
       this.pendingNewChat = null;
     }
