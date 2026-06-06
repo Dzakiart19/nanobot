@@ -16,14 +16,19 @@ echo "    ✓ Dzeck engine installed"
 echo "▶ [2/6] Installing extra Python dependencies..."
 pip install -q \
     pymongo \
+    bcrypt \
     discord.py \
     aiohttp
 echo "    ✓ Extra Python dependencies installed"
 
 # ── 3. Optional Python extras ─────────────────────────────────────────────────
-echo "▶ [3/6] Installing optional Python extras (api, discord)..."
-pip install -q -e ".[api,discord]"
+echo "▶ [3/6] Installing optional Python extras..."
+pip install -q -e ".[api,discord,msteams,azure,pdf,langsmith,olostep,weixin,wecom]"
 echo "    ✓ Optional extras installed"
+
+# ── 3b. Matrix extras (needs native libolm — skip if unavailable) ─────────────
+echo "▶ [3b/6] Installing Matrix extras (may skip if native deps unavailable)..."
+pip install -q -e ".[matrix]" 2>/dev/null && echo "    ✓ Matrix extras installed" || echo "    ⚠ Matrix extras skipped (missing native deps)"
 
 # ── 4. Frontend dependencies ──────────────────────────────────────────────────
 echo "▶ [4/6] Installing frontend dependencies (webui)..."
