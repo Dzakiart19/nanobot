@@ -90,3 +90,4 @@ build = ["bash", "-c", "cd webui && npm install && npm run build"]
 NANOBOT_API_KEY = "sk-dzcxNdD2d0s7XWTliVdpxjkP-o_3yNTrezA-FILk8cXcgl34"
 NANOBOT_API_BASE = "https://divine-vittoria-dzeckyete-d2996f6e.koyeb.app/v1"
 NANOBOT_MODEL = "qwen3.7-max"
+MONGODB_DATABASE = "dzeckbot"
