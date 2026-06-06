@@ -19,7 +19,7 @@ const PUBLIC_HOST = process.env.REPLIT_DEV_DOMAIN || "localhost:5000";
 const BASE_URL = `https://${PUBLIC_HOST}`;
 const NEW_CHAT_TIMEOUT_MS = 8_000;   // was 5000 — relaxed for test
 const AI_RESPONSE_TIMEOUT_MS = 30_000;
-const NANOBOT_AUTH_SECRET = process.env.NANOBOT_AUTH_SECRET || "";
+const DZECK_AUTH_SECRET = process.env.DZECK_AUTH_SECRET || "";
 
 function pass(msg) { console.log(`  ✅ ${msg}`); }
 function fail(msg) { console.error(`  ❌ ${msg}`); }
@@ -27,8 +27,8 @@ function info(msg) { console.log(`  ℹ  ${msg}`); }
 
 function fetchJson(url) {
   const options = { rejectUnauthorized: false };
-  if (NANOBOT_AUTH_SECRET) {
-    options.headers = { "X-Nanobot-Auth": NANOBOT_AUTH_SECRET };
+  if (DZECK_AUTH_SECRET) {
+    options.headers = { "X-Dzeck-Auth": DZECK_AUTH_SECRET };
   }
   return new Promise((resolve, reject) => {
     const mod = url.startsWith("https") ? https : http;
@@ -68,7 +68,7 @@ async function fetchJsonWithRetry(url, maxAttempts = 10, delayMs = 3000) {
 }
 
 async function main() {
-  console.log(`\n🧪 Nanobot E2E — WebSocket send-message flow`);
+  console.log(`\n🧪 Dzeck E2E — WebSocket send-message flow`);
   console.log(`   Public URL: ${BASE_URL}\n`);
 
   // ── Step 1: Bootstrap ──────────────────────────────────────────────────────

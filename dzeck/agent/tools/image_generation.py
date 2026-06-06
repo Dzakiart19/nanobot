@@ -36,7 +36,7 @@ if TYPE_CHECKING:
 
 class ImageGenerationToolConfig(Base):
     """Image generation tool configuration."""
-    enabled: bool = False
+    enabled: bool = True
     provider: str = "openrouter"
     model: str = "openai/gpt-5.4-image-2"
     default_aspect_ratio: str = "1:1"

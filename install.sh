@@ -3,45 +3,77 @@ set -e
 
 echo ""
 echo "╔══════════════════════════════════════════╗"
-echo "║        🐈 Dzeck installer                 ║"
+echo "║        🗿 Dzeck installer                 ║"
 echo "╚══════════════════════════════════════════╝"
 echo ""
 
+# ── 0. System dependencies (via Nix / nix-env) ────────────────────────────────
+echo "▶ [0/7] Installing system dependencies..."
+NIX_PKGS=(
+    # Core utilities
+    coreutils findutils gnugrep gnused gawk
+    # Text editors
+    nano vim
+    # Network tools
+    curl wget openssh rsync inetutils nmap dnsutils netcat-openbsd
+    # Archive & compression
+    zip unzip gnutar gzip bzip2 xz
+    # Process & system management
+    procps htop lsof
+    # Media & document processing
+    ffmpeg imagemagick pandoc
+    # Data tools
+    jq yq-go
+    # File utilities
+    file tree which
+)
+if command -v nix-env &>/dev/null; then
+    nix-env -iA nixpkgs."${NIX_PKGS[@]}" 2>/dev/null \
+        && echo "    ✓ Nix packages installed" \
+        || echo "    ⚠ Some Nix packages skipped (may already be installed)"
+else
+    echo "    ⚠ nix-env not found — skipping system packages (they may already be available)"
+fi
+
 # ── 1. Python package (core dependencies dari pyproject.toml) ─────────────────
-echo "▶ [1/6] Installing Python package (Dzeck engine)..."
+echo "▶ [1/7] Installing Python package (Dzeck engine)..."
 pip install -e . -q
 echo "    ✓ Dzeck engine installed"
 
 # ── 2. Extra Python dependencies (tidak ada di pyproject.toml) ───────────────
-echo "▶ [2/6] Installing extra Python dependencies..."
+echo "▶ [2/7] Installing extra Python dependencies..."
 pip install -q \
     pymongo \
     bcrypt \
     discord.py \
-    aiohttp
+    aiohttp \
+    Pillow \
+    requests \
+    httpx \
+    pytz
 echo "    ✓ Extra Python dependencies installed"
 
 # ── 3. Optional Python extras ─────────────────────────────────────────────────
-echo "▶ [3/6] Installing optional Python extras..."
+echo "▶ [3/7] Installing optional Python extras..."
 pip install -q -e ".[api,discord,msteams,azure,pdf,langsmith,olostep,weixin,wecom]"
 echo "    ✓ Optional extras installed"
 
 # ── 3b. Matrix extras (needs native libolm — skip if unavailable) ─────────────
-echo "▶ [3b/6] Installing Matrix extras (may skip if native deps unavailable)..."
+echo "▶ [3b/7] Installing Matrix extras (may skip if native deps unavailable)..."
 pip install -q -e ".[matrix]" 2>/dev/null && echo "    ✓ Matrix extras installed" || echo "    ⚠ Matrix extras skipped (missing native deps)"
 
 # ── 4. Frontend dependencies ──────────────────────────────────────────────────
-echo "▶ [4/6] Installing frontend dependencies (webui)..."
+echo "▶ [4/7] Installing frontend dependencies (webui)..."
 cd webui && npm install -q && cd ..
 echo "    ✓ webui dependencies installed"
 
 # ── 5. Root / e2e dependencies ────────────────────────────────────────────────
-echo "▶ [5/6] Installing root dependencies (e2e/ws/playwright)..."
+echo "▶ [5/7] Installing root dependencies (e2e/ws/playwright)..."
 npm install -q
 echo "    ✓ root dependencies installed"
 
 # ── 6. Create dzeck config ──────────────────────────────────────────────────
-echo "▶ [6/6] Setting up Dzeck config (~/.dzeck/config.json)..."
+echo "▶ [6/7] Setting up Dzeck config (~/.dzeck/config.json)..."
 CONFIG_DIR="${HOME}/.dzeck"
 CONFIG_FILE="${CONFIG_DIR}/config.json"
 mkdir -p "$CONFIG_DIR"
@@ -67,8 +99,17 @@ config.setdefault("providers", {})["custom"] = {
     "apiKey": "${DZECK_API_KEY}",
     "apiBase": "${DZECK_API_BASE}",
 }
-config.setdefault("agents", {}).setdefault("defaults", {})["provider"] = "custom"
-config.setdefault("agents", {}).setdefault("defaults", {})["model"] = "${DZECK_MODEL}"
+
+defaults = config.setdefault("agents", {}).setdefault("defaults", {})
+defaults["provider"] = "custom"
+defaults["model"] = "${DZECK_MODEL}"
+defaults["contextWindowTokens"] = 262144
+defaults["timezone"] = "Asia/Jakarta"
+defaults["botIcon"] = "🗿"
+
+# Enable image generation by default
+tools = config.setdefault("tools", {})
+tools.setdefault("image", {})["enabled"] = True
 
 ws = config.setdefault("channels", {}).setdefault("websocket", {})
 ws["enabled"] = True
@@ -83,13 +124,23 @@ with open(config_file, "w") as f:
 print(f"    ✓ Config ready → apiKey=${{DZECK_API_KEY}}, apiBase=${{DZECK_API_BASE}}, model=${{DZECK_MODEL}}")
 PYEOF
 
+# ── 7. Verify key commands ─────────────────────────────────────────────────────
+echo "▶ [7/7] Verifying installed commands..."
+for cmd in dzeck python3 node npm curl jq; do
+    if command -v "$cmd" &>/dev/null; then
+        echo "    ✓ $cmd → $(command -v $cmd)"
+    else
+        echo "    ⚠ $cmd not found"
+    fi
+done
+
 # ── Done ──────────────────────────────────────────────────────────────────────
 echo ""
 echo "╔══════════════════════════════════════════╗"
 echo "║  ✅ Dzeck siap dijalankan!                ║"
 echo "║                                          ║"
 echo "║  Jalankan project:                       ║"
-echo "║    Backend : dzeck gateway --port 8080 ║"
+echo "║    Backend : dzeck gateway --port 8080   ║"
 echo "║    Frontend: cd webui && npm run dev     ║"
 echo "║                                          ║"
 echo "║  Login password: admin123                ║"

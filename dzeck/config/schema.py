@@ -94,7 +94,7 @@ class ModelPresetConfig(Base):
     model: str
     provider: str = "auto"
     max_tokens: int = 8192
-    context_window_tokens: int = 65_536
+    context_window_tokens: int = 262_144
     temperature: float = 0.1
     reasoning_effort: str | None = None
 
@@ -117,7 +117,7 @@ class AgentDefaults(Base):
         "auto"  # Provider name (e.g. "anthropic", "openrouter") or "auto" for auto-detection
     )
     max_tokens: int = 8192
-    context_window_tokens: int = 65_536
+    context_window_tokens: int = 262_144
     context_block_limit: int | None = None
     temperature: float = 0.1
     fallback_models: list[FallbackCandidate] = Field(default_factory=list)
@@ -133,9 +133,9 @@ class AgentDefaults(Base):
         serialization_alias="toolHintMaxLength",
     )  # Max characters for tool hint display (e.g. "$ cd …/project && npm test")
     reasoning_effort: str | None = None  # low / medium / high / adaptive / none — LLM thinking effort; None preserves the provider default
-    timezone: str = "UTC"  # IANA timezone, e.g. "Asia/Shanghai", "America/New_York"
+    timezone: str = "Asia/Jakarta"  # IANA timezone, e.g. "Asia/Shanghai", "America/New_York"
     bot_name: str = "Dzeck"  # Display name shown in CLI prompts (e.g. "{name} is thinking...")
-    bot_icon: str = "🐈"  # Short icon (emoji or text) shown next to the bot name in CLI; "" to omit
+    bot_icon: str = "🗿"  # Short icon (emoji or text) shown next to the bot name in CLI; "" to omit
     unified_session: bool = False  # Share one session across all channels (single-user multi-device)
     disabled_skills: list[str] = Field(default_factory=list)  # Skill names to exclude from loading (e.g. ["summarize", "skill-creator"])
     session_ttl_minutes: int = Field(

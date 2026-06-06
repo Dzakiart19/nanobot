@@ -87,12 +87,12 @@ build = ["bash", "-c", "pip install ."]
 [userenv]
 
 [userenv.shared]
-NANOBOT_API_KEY = "sk-dzcxELP19ZTLGJXKoo_8MiLpFn8iM8VTpim86l57KQFJ8tt6"
-NANOBOT_API_BASE = "https://chat-gateway--tmi84kzh.replit.app/v1"
-NANOBOT_MODEL = "qwen3.7-max"
 MONGODB_DATABASE = "dzeckbot"
 MONGODB_URI = "mongodb+srv://galerizaki_db_user:wTkfzrqewY5qCxYG@cluster0.vmiek8b.mongodb.net/manus?retryWrites=true&w=majority"
 OPENAI_BASE_URL = "https://chat-gateway--tmi84kzh.replit.app/v1"
 OPENAI_API_KEY = "sk-dzcxELP19ZTLGJXKoo_8MiLpFn8iM8VTpim86l57KQFJ8tt6"
 SSL_CERT_FILE = "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/certifi/cacert.pem"
 REQUESTS_CA_BUNDLE = "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/certifi/cacert.pem"
+DZECK_API_KEY = "sk-dzcxELP19ZTLGJXKoo_8MiLpFn8iM8VTpim86l57KQFJ8tt6"
+DZECK_API_BASE = "https://chat-gateway--tmi84kzh.replit.app/v1"
+DZECK_MODEL = "qwen3.7-max"

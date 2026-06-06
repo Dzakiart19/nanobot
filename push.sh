@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# NOTE: If you have renamed the GitHub repo, update REPO below to match the new name.
 REPO="Dzakiart19/nanobot"
 
 if [ -z "$GITHUB_TOKEN" ]; then
