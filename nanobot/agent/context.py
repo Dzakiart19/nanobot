@@ -1,6 +1,7 @@
 """Context builder for assembling agent prompts."""
 
 import base64
+import io
 import mimetypes
 import platform
 from pathlib import Path
@@ -258,6 +259,7 @@ class ContextBuilder:
             mime = detect_image_mime(raw) or mimetypes.guess_type(path)[0]
             if not mime or not mime.startswith("image/"):
                 continue
+            raw, mime = _compress_image(raw, mime)
             b64 = base64.b64encode(raw).decode()
             images.append({
                 "type": "image_url",
@@ -268,3 +270,22 @@ class ContextBuilder:
         if not images:
             return text
         return images + [{"type": "text", "text": text}]
+
+
+def _compress_image(raw: bytes, mime: str, max_px: int = 1920, quality: int = 85) -> tuple[bytes, str]:
+    """Resize and compress an image so the base64 payload stays small."""
+    try:
+        from PIL import Image  # noqa: PLC0415
+
+        img = Image.open(io.BytesIO(raw))
+        if img.mode not in ("RGB", "L"):
+            img = img.convert("RGB")
+        w, h = img.size
+        if max(w, h) > max_px:
+            scale = max_px / max(w, h)
+            img = img.resize((int(w * scale), int(h * scale)), Image.LANCZOS)
+        buf = io.BytesIO()
+        img.save(buf, format="JPEG", quality=quality, optimize=True)
+        return buf.getvalue(), "image/jpeg"
+    except Exception:
+        return raw, mime
