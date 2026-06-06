@@ -82,7 +82,7 @@ externalPort = 8081
 [deployment]
 deploymentTarget = "autoscale"
 run = ["bash", "-c", "bash scripts/start-production.sh"]
-build = ["bash", "-c", "cd webui && npm install && npm run build"]
+build = ["bash", "-c", "pip install ."]
 
 [userenv]
 
