@@ -30,13 +30,13 @@ args = "e2e-send-message"
 name = "Start application"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd webui && npm run dev"
-waitForPort = 5000
-
 [workflows.workflow.metadata]
 outputType = "webview"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd webui && npm install && npm run dev"
+waitForPort = 5000
 
 [[workflows.workflow]]
 name = "Backend Gateway"
@@ -47,7 +47,7 @@ outputType = "console"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "nanobot gateway --port 8080"
+args = "bash scripts/setup-dev.sh && nanobot gateway --port 8080"
 waitForPort = 8080
 
 [[workflows.workflow]]
@@ -66,18 +66,8 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 8000
-externalPort = 8000
-exposeLocalhost = true
-
-[[ports]]
 localPort = 8080
 externalPort = 8080
-exposeLocalhost = true
-
-[[ports]]
-localPort = 8081
-externalPort = 8081
 
 [deployment]
 deploymentTarget = "autoscale"
