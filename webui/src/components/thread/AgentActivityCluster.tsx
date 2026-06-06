@@ -1364,12 +1364,12 @@ function previewMcpArgs(argsObject: unknown): string {
   const record = argsObject as Record<string, unknown>;
   for (const key of ["url", "query", "q", "path", "name", "id", "title", "message", "text"]) {
     const preview = previewScalar(record[key]);
-    if (preview) return `${key}: ${preview}`;
+    if (preview) return preview;
   }
   const entries = Object.entries(record)
     .filter(([, value]) => previewScalar(value) !== null)
     .slice(0, 2)
-    .map(([key, value]) => `${key}: ${previewScalar(value)}`);
+    .map(([, value]) => previewScalar(value) as string);
   return entries.join(" · ");
 }
 
