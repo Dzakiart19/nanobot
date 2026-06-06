@@ -73,39 +73,19 @@ Use this file for project-specific preferences, recurring workflow conventions, 
 
 ## File Delivery After Task Completion
 
-**Always use `deliver_file` to hand deliverables to the user** — never just tell them where to find the file manually.
+When you finish creating a file or project, **call the `deliver_file` tool** so the user gets a real download link.
 
-### When to deliver
-Whenever you finish a task that produces output the user can use or keep:
-- Code project / folder → zip and deliver
-- Document (`.md`, `.txt`, `.pdf`, `.docx`, `.pptx`) → deliver as-is
-- Single script or config file → deliver as-is
-- Data export (`.csv`, `.json`, `.xlsx`) → deliver as-is
-- Any file the user explicitly asked you to create or download
+- Directory → tool auto-zips it, give a clear filename like `my-project.zip`
+- Single file → delivered as-is
 
-### How to deliver
-1. Call `deliver_file` with the path to the file or directory.
-   - A **directory** is automatically zipped — pass the folder path and set a friendly `filename` like `"my-project.zip"`.
-   - A **single file** is delivered directly — pass the file path.
-2. Include the returned markdown download link **in your reply**, so the user sees a clickable download button.
-3. Mention briefly what the file contains.
+After calling the tool, paste the link it returns into your reply. Never write a download link by hand — the link must come from the tool call result.
 
-### Example (project folder)
-```
-deliver_file(path="chatgpt-web", filename="chatgpt-web.zip")
-→ [📦 Download chatgpt-web.zip](/webui/download/<token>)
-```
-
-### Example (single document)
-```
-deliver_file(path="laporan.md", filename="laporan.md")
-→ [📦 Download laporan.md](/webui/download/<token>)
-```
+### When to call it
+Any time you finish creating something the user will want to keep: code projects, documents, scripts, data exports, zip archives, etc.
 
 ### Do NOT
-- Do not just say "file ada di folder X" without delivering it.
-- Do not skip delivery because the user can "see the file" — they may not have file-system access.
-- Do not hardcode download paths — always use the token returned by `deliver_file`.
+- Write `[📦 Download ...]` manually — that is not a real link, the tool must generate it.
+- Tell the user "file ada di folder X" without calling the tool first.
 
 ## Scheduled Reminders
 
