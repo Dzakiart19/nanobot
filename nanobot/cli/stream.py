@@ -45,7 +45,7 @@ def _make_console() -> Console:
 class ThinkingSpinner:
     """Spinner that shows '<bot_name> is thinking...' with pause support."""
 
-    def __init__(self, console: Console | None = None, bot_name: str = "nanobot"):
+    def __init__(self, console: Console | None = None, bot_name: str = "Dzeck"):
         c = console or _make_console()
         self._console = c
         self._spinner = c.status(f"[dim]{bot_name} is thinking...[/dim]", spinner="dots")
