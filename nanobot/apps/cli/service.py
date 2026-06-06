@@ -23,6 +23,14 @@ from nanobot.config.paths import get_runtime_subdir
 from nanobot.security.workspace_policy import is_path_within
 
 CLI_ANYTHING_REGISTRY_URL = "https://hkuds.github.io/CLI-Anything/registry.json"
+
+_SYSTEM_PKG_MANAGERS = {"brew", "apt", "apt-get", "yum", "dnf", "pacman", "snap", "zypper"}
+
+
+def _is_replit() -> bool:
+    return bool(os.environ.get("REPL_ID") or os.environ.get("REPLIT_DEV_DOMAIN"))
+
+
 CLI_ANYTHING_PUBLIC_REGISTRY_URL = "https://hkuds.github.io/CLI-Anything/public_registry.json"
 CLI_ANYTHING_RAW_BASE = "https://raw.githubusercontent.com/HKUDS/CLI-Anything/main"
 NANOBOT_EXTENSION_REGISTRY_URL = "https://raw.githubusercontent.com/Re-bin/nanobot-extension/main/registry.json"
@@ -842,6 +850,15 @@ class CliAppManager:
         raise CliAppError("this CLI app uses an unsupported install strategy")
 
     def _run_argv(self, argv: list[str], *, timeout: int) -> subprocess.CompletedProcess[str]:
+        if argv and _is_replit():
+            cmd = Path(argv[0]).name
+            if cmd in _SYSTEM_PKG_MANAGERS:
+                raise CliAppError(
+                    f"Installing CLI apps via '{cmd}' is not supported on Replit. "
+                    "System package managers are blocked in this environment. "
+                    "You can still use built-in agent tools and MCP services from the Apps page.",
+                    status=501,
+                )
         return subprocess.run(
             argv,
             capture_output=True,
