@@ -1,0 +1,88 @@
+modules = ["python-3.11", "nodejs-20", "web", "bash"]
+[agent]
+expertMode = true
+stack = "BEST_EFFORT_FALLBACK"
+
+[nix]
+channel = "stable-25_05"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start application"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Backend Gateway"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "e2e-send-message"
+
+[[workflows.workflow]]
+name = "Start application"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd webui && npm run dev"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[workflows.workflow]]
+name = "Backend Gateway"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "nanobot gateway --port 8080"
+waitForPort = 8080
+
+[[workflows.workflow]]
+name = "e2e-send-message"
+author = "agent"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node e2e/test-send-message.js"
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[[ports]]
+localPort = 8000
+externalPort = 8000
+exposeLocalhost = true
+
+[[ports]]
+localPort = 8080
+externalPort = 8080
+exposeLocalhost = true
+
+[deployment]
+deploymentTarget = "vm"
+run = ["bash", "-c", "nanobot gateway --port 8080 & cd webui && npm run dev -- --port 5000"]
+build = ["bash", "-c", "cd webui && npm run build"]
+
+[userenv]
+
+[userenv.shared]
+NANOBOT_API_KEY = "sk-dzcxNdD2d0s7XWTliVdpxjkP-o_3yNTrezA-FILk8cXcgl34"
+NANOBOT_API_BASE = "https://divine-vittoria-dzeckyete-d2996f6e.koyeb.app/v1"
+NANOBOT_MODEL = "qwen3.7-max"
