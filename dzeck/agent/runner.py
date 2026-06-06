@@ -689,8 +689,8 @@ class AgentRunner:
         if timeout_s is None:
             # Default to a finite timeout to avoid per-session lock starvation when an LLM
             # request hangs indefinitely (e.g. gateway/network stall).
-            # Set NANOBOT_LLM_TIMEOUT_S=0 to disable.
-            raw = os.environ.get("NANOBOT_LLM_TIMEOUT_S", "300").strip()
+            # Set DZECK_LLM_TIMEOUT_S=0 to disable.
+            raw = os.environ.get("DZECK_LLM_TIMEOUT_S", "300").strip()
             try:
                 timeout_s = float(raw)
             except (TypeError, ValueError):
@@ -783,9 +783,9 @@ class AgentRunner:
             coro = self.provider.chat_with_retry(**kwargs)
 
         # Streaming requests already have provider-level idle timeouts
-        # (NANOBOT_STREAM_IDLE_TIMEOUT_S). Do not also apply the outer wall-clock
+        # (DZECK_STREAM_IDLE_TIMEOUT_S). Do not also apply the outer wall-clock
         # LLM timeout here, or healthy long reasoning streams can be killed just
-        # because total elapsed time exceeded NANOBOT_LLM_TIMEOUT_S.
+        # because total elapsed time exceeded DZECK_LLM_TIMEOUT_S.
         outer_timeout_s = None if (wants_streaming or wants_progress_streaming) else timeout_s
         try:
             response = (

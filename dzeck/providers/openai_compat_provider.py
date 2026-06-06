@@ -116,7 +116,7 @@ def _gateway_reasoning_extra_body(style: str, effort: str | None) -> dict[str, A
 
 def _openai_compat_timeout_s() -> float:
     """Return the bounded request timeout used for OpenAI-compatible providers."""
-    return _float_env("NANOBOT_OPENAI_COMPAT_TIMEOUT_S", _OPENAI_COMPAT_REQUEST_TIMEOUT_S)
+    return _float_env("DZECK_OPENAI_COMPAT_TIMEOUT_S", _OPENAI_COMPAT_REQUEST_TIMEOUT_S)
 
 
 def _float_env(name: str, default: float) -> float:
@@ -1363,7 +1363,7 @@ class OpenAICompatProvider(LLMProvider):
         on_tool_call_delta: Callable[[dict[str, Any]], Awaitable[None]] | None = None,
     ) -> LLMResponse:
         await self._ensure_client()
-        idle_timeout_s = int(os.environ.get("NANOBOT_STREAM_IDLE_TIMEOUT_S", "90"))
+        idle_timeout_s = int(os.environ.get("DZECK_STREAM_IDLE_TIMEOUT_S", "90"))
         try:
             if self._should_use_responses_api(model, reasoning_effort):
                 try:

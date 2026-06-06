@@ -39,16 +39,16 @@ if os.path.exists(config_file):
 else:
     config = {}
 
-password = os.environ.get("NANOBOT_PASSWORD", "admin123")
+password = os.environ.get("DZECK_PASSWORD", "admin123")
 
 # Always use ${VAR} references — values resolved at runtime from env vars
 config.setdefault("providers", {})["custom"] = {
     "type": "openai",
-    "apiKey": "${NANOBOT_API_KEY}",
-    "apiBase": "${NANOBOT_API_BASE}",
+    "apiKey": "${DZECK_API_KEY}",
+    "apiBase": "${DZECK_API_BASE}",
 }
 config.setdefault("agents", {}).setdefault("defaults", {})["provider"] = "custom"
-config.setdefault("agents", {}).setdefault("defaults", {})["model"] = "${NANOBOT_MODEL}"
+config.setdefault("agents", {}).setdefault("defaults", {})["model"] = "${DZECK_MODEL}"
 
 ws = config.setdefault("channels", {}).setdefault("websocket", {})
 ws["enabled"] = True
@@ -60,7 +60,7 @@ ws["tokenIssueSecret"] = password
 with open(config_file, "w") as f:
     json.dump(config, f, indent=2)
 
-print("Config ready: apiKey=${NANOBOT_API_KEY}, apiBase=${NANOBOT_API_BASE}, model=${NANOBOT_MODEL}")
+print("Config ready: apiKey=${DZECK_API_KEY}, apiBase=${DZECK_API_BASE}, model=${DZECK_MODEL}")
 
 # Write AGENTS.md — agent instructions (file delivery + workspace conventions)
 agents_md = os.path.expanduser("~/.dzeck/workspace/AGENTS.md")

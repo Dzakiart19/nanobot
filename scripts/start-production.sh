@@ -17,10 +17,10 @@ if os.path.exists(config_file):
 else:
     config = {}
 
-api_key  = os.environ.get("NANOBOT_API_KEY", "")
-api_base = os.environ.get("NANOBOT_API_BASE", "")
-model    = os.environ.get("NANOBOT_MODEL", "gpt-4o-mini")
-password = os.environ.get("NANOBOT_PASSWORD", "")
+api_key  = os.environ.get("DZECK_API_KEY", "")
+api_base = os.environ.get("DZECK_API_BASE", "")
+model    = os.environ.get("DZECK_MODEL", "gpt-4o-mini")
+password = os.environ.get("DZECK_PASSWORD", "")
 
 if api_key and api_base:
     config.setdefault("providers", {})["custom"] = {

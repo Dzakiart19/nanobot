@@ -415,8 +415,8 @@ class ExecTool(Tool):
             if _IS_WINDOWS:
                 env["PATH"] = env.get("PATH", "") + os.pathsep + self.path_append
             else:
-                env["NANOBOT_PATH_APPEND"] = self.path_append
-                command = f'export PATH="$PATH{os.pathsep}$NANOBOT_PATH_APPEND"; {command}'
+                env["DZECK_PATH_APPEND"] = self.path_append
+                command = f'export PATH="$PATH{os.pathsep}$DZECK_PATH_APPEND"; {command}'
 
         shell_program, shell_error = self._resolve_shell(shell)
         if shell_error:

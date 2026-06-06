@@ -41,11 +41,11 @@ class TestBuildEnvUnix:
 
     def test_secrets_excluded(self, monkeypatch):
         monkeypatch.setenv("OPENAI_API_KEY", "sk-secret")
-        monkeypatch.setenv("NANOBOT_TOKEN", "tok-secret")
+        monkeypatch.setenv("DZECK_TOKEN", "tok-secret")
         with patch("dzeck.agent.tools.shell._IS_WINDOWS", False):
             env = ExecTool()._build_env()
         assert "OPENAI_API_KEY" not in env
-        assert "NANOBOT_TOKEN" not in env
+        assert "DZECK_TOKEN" not in env
         for v in env.values():
             assert "secret" not in v.lower()
 
@@ -65,11 +65,11 @@ class TestBuildEnvWindows:
 
     def test_secrets_excluded(self, monkeypatch):
         monkeypatch.setenv("OPENAI_API_KEY", "sk-secret")
-        monkeypatch.setenv("NANOBOT_TOKEN", "tok-secret")
+        monkeypatch.setenv("DZECK_TOKEN", "tok-secret")
         with patch("dzeck.agent.tools.shell._IS_WINDOWS", True):
             env = ExecTool()._build_env()
         assert "OPENAI_API_KEY" not in env
-        assert "NANOBOT_TOKEN" not in env
+        assert "DZECK_TOKEN" not in env
         for v in env.values():
             assert "secret" not in v.lower()
 
@@ -198,8 +198,8 @@ class TestPathAppendPlatform:
             tool = ExecTool(path_append="/opt/bin; echo INJECTED")
             await tool.execute(command="ls")
 
-        assert captured_cmd == 'export PATH="$PATH:$NANOBOT_PATH_APPEND"; ls'
-        assert captured_env["NANOBOT_PATH_APPEND"] == "/opt/bin; echo INJECTED"
+        assert captured_cmd == 'export PATH="$PATH:$DZECK_PATH_APPEND"; ls'
+        assert captured_env["DZECK_PATH_APPEND"] == "/opt/bin; echo INJECTED"
         assert "INJECTED" not in captured_cmd
 
     @pytest.mark.asyncio
