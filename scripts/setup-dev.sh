@@ -21,24 +21,28 @@ if ! command -v nanobot &> /dev/null; then
     fi
 fi
 
-# Create Dzeck config if it doesn't exist
+# Always sync API key/base from env vars into config
 CONFIG_DIR="${HOME}/.nanobot"
 CONFIG_FILE="${CONFIG_DIR}/config.json"
+mkdir -p "$CONFIG_DIR"
 
-if [ ! -f "$CONFIG_FILE" ]; then
-    echo "Creating Dzeck config..."
-    mkdir -p "$CONFIG_DIR"
-    python3 - <<'PYEOF'
-import json, os, secrets
+python3 - <<'PYEOF'
+import json, os
 
 config_dir = os.path.expanduser("~/.nanobot")
 config_file = config_dir + "/config.json"
 os.makedirs(config_dir, exist_ok=True)
 
-config = {}
+if os.path.exists(config_file):
+    with open(config_file) as f:
+        config = json.load(f)
+else:
+    config = {}
+
 api_key  = os.environ.get("NANOBOT_API_KEY", "")
 api_base = os.environ.get("NANOBOT_API_BASE", "")
 model    = os.environ.get("NANOBOT_MODEL", "gpt-4o-mini")
+password = os.environ.get("NANOBOT_PASSWORD", "admin123")
 
 if api_key and api_base:
     config.setdefault("providers", {})["custom"] = {
@@ -49,7 +53,6 @@ if api_key and api_base:
     config.setdefault("agents", {}).setdefault("defaults", {})["provider"] = "custom"
     config.setdefault("agents", {}).setdefault("defaults", {})["model"] = model
 
-password = os.environ.get("NANOBOT_PASSWORD", "admin123")
 ws = config.setdefault("channels", {}).setdefault("websocket", {})
 ws["enabled"] = True
 ws["host"]    = "0.0.0.0"
@@ -60,6 +63,5 @@ ws["tokenIssueSecret"] = password
 with open(config_file, "w") as f:
     json.dump(config, f, indent=2)
 
-print(f"Config written: model={model}, ws_port=8081")
+print(f"Config synced: model={model}, apiBase={api_base}, ws_port=8081")
 PYEOF
-fi
