@@ -202,6 +202,28 @@
     --cjk-line-height: 1.625;
   }
 
+  /* Blinking block cursor shown at end of a streaming AI response. */
+  @keyframes streaming-cursor-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+  .streaming-cursor {
+    display: inline-block;
+    width: 0.45em;
+    height: 1.05em;
+    background-color: hsl(var(--foreground) / 0.75);
+    vertical-align: text-bottom;
+    border-radius: 1px;
+    margin-left: 2px;
+    animation: streaming-cursor-blink 0.85s step-end infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .streaming-cursor {
+      animation: none;
+      opacity: 0.6;
+    }
+  }
+
   /* L→R sheen clipped to live activity labels. The highlight lives inside
      the glyphs, not in the row background, so dark mode stays quiet. */
   @keyframes streaming-text-sheen-ltr {

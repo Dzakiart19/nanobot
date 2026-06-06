@@ -148,7 +148,10 @@ export function MessageBubble({
         <TypingDots />
       ) : empty && message.isStreaming ? null : (
         <>
-          <MarkdownText streaming={!!message.isStreaming}>{message.content}</MarkdownText>
+          <div className="relative">
+            <MarkdownText streaming={!!message.isStreaming}>{message.content}</MarkdownText>
+            {message.isStreaming && <span className="streaming-cursor" aria-hidden="true" />}
+          </div>
           {media.length > 0 ? <MessageMedia media={media} align="left" /> : null}
           {showAssistantFooterRow ? (
             <div className="mt-2 flex min-h-8 flex-wrap items-center gap-x-2 gap-y-1 text-muted-foreground">
