@@ -48,13 +48,32 @@ function fetchJson(url) {
   });
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchJsonWithRetry(url, maxAttempts = 10, delayMs = 3000) {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await fetchJson(url);
+    } catch (err) {
+      const retryable = err.message.includes("502") || err.message.includes("503") ||
+        err.message.includes("ECONNREFUSED") || err.message.includes("fetch timeout") ||
+        err.message.includes("ECONNRESET");
+      if (!retryable || attempt === maxAttempts) throw err;
+      info(`Backend not ready yet (attempt ${attempt}/${maxAttempts}), retrying in ${delayMs / 1000}s…`);
+      await sleep(delayMs);
+    }
+  }
+}
+
 async function main() {
   console.log(`\n🧪 Nanobot E2E — WebSocket send-message flow`);
   console.log(`   Public URL: ${BASE_URL}\n`);
 
   // ── Step 1: Bootstrap ──────────────────────────────────────────────────────
   console.log("Step 1: Fetching bootstrap from PUBLIC URL...");
-  const boot = await fetchJson(`${BASE_URL}/webui/bootstrap`);
+  const boot = await fetchJsonWithRetry(`${BASE_URL}/webui/bootstrap`);
   info(`ws_path   = ${boot.ws_path}`);
   info(`ws_url    = ${boot.ws_url}`);
   info(`model     = ${boot.model_name}`);
