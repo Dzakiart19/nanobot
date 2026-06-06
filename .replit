@@ -80,9 +80,9 @@ localPort = 8081
 externalPort = 8081
 
 [deployment]
-deploymentTarget = "vm"
-run = ["bash", "-c", "nanobot gateway --port 8080 & cd webui && npm run dev -- --port 5000"]
-build = ["bash", "-c", "cd webui && npm run build"]
+deploymentTarget = "autoscale"
+run = ["bash", "-c", "bash scripts/start-production.sh"]
+build = ["bash", "-c", "cd webui && npm install && npm run build"]
 
 [userenv]
 
