@@ -18,7 +18,7 @@ from dzeck.providers.registry import find_by_name
 from dzeck.utils.helpers import detect_image_mime
 
 _OPENROUTER_ATTRIBUTION_HEADERS = {
-    "HTTP-Referer": "https://github.com/HKUDS/nanobot",
+    "HTTP-Referer": "https://github.com/HKUDSLab/dzeck",
     "X-OpenRouter-Title": "dzeck",
     "X-OpenRouter-Categories": "cli-agent,personal-agent",
 }
