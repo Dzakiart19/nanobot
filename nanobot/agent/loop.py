@@ -1623,9 +1623,25 @@ class AgentLoop:
         return True
 
     def _set_runtime_checkpoint(self, session: Session, payload: dict[str, Any]) -> None:
-        """Persist the latest in-flight turn state into session metadata."""
+        """Persist the latest in-flight turn state into session metadata.
+
+        Save errors (e.g. UnicodeEncodeError from surrogate chars in model
+        responses) are caught here so a bad checkpoint does not abort the
+        current turn.  The checkpoint is used only for crash-recovery; losing
+        it is preferable to crashing the entire conversation.
+        """
         session.metadata[self._RUNTIME_CHECKPOINT_KEY] = payload
-        self.sessions.save(session)
+        try:
+            self.sessions.save(session)
+        except Exception as exc:
+            logger.warning(
+                "Could not persist runtime checkpoint for session {} "
+                "(data may contain invalid characters); turn will continue "
+                "without a checkpoint: {}",
+                session.key,
+                exc,
+            )
+            session.metadata.pop(self._RUNTIME_CHECKPOINT_KEY, None)
 
     def _mark_pending_user_turn(self, session: Session) -> None:
         session.metadata[self._PENDING_USER_TURN_KEY] = True

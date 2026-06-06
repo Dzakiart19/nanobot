@@ -432,6 +432,13 @@ export function useNanobotStream(
    * the loading spinner alive across tool-call boundaries without needing
    * backend changes. */
   const streamEndTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /**
+   * Watchdog timer: if the model is streaming but no events arrive for
+   * WATCHDOG_MS ms (e.g. backend errored without sending turn_end),
+   * auto-reset isStreaming so the UI is not stuck forever.
+   */
+  const WATCHDOG_MS = 90_000;
+  const watchdogTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     return client.onError((err) => setStreamError(err));
@@ -654,6 +661,10 @@ export function useNanobotStream(
       clearTimeout(streamEndTimerRef.current);
       streamEndTimerRef.current = null;
     }
+    if (watchdogTimerRef.current !== null) {
+      clearTimeout(watchdogTimerRef.current);
+      watchdogTimerRef.current = null;
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatId, client, clearActivitySegment, clearPendingStreamWork]);
 
@@ -664,6 +675,20 @@ export function useNanobotStream(
   useEffect(() => {
     if (!chatId) return;
 
+    const resetWatchdog = () => {
+      if (watchdogTimerRef.current !== null) clearTimeout(watchdogTimerRef.current);
+      watchdogTimerRef.current = setTimeout(() => {
+        watchdogTimerRef.current = null;
+        setIsStreaming((prev) => {
+          if (!prev) return prev;
+          return false;
+        });
+        setMessages((prev) =>
+          prev.map((m) => (m.isStreaming ? { ...m, isStreaming: false } : m)),
+        );
+      }, WATCHDOG_MS);
+    };
+
     const handle = (ev: InboundEvent) => {
       // Any incoming event while the debounce timer is alive means the model
       // is still working (e.g. tool result arrived, more text to stream).
@@ -672,6 +697,9 @@ export function useNanobotStream(
         clearTimeout(streamEndTimerRef.current);
         streamEndTimerRef.current = null;
       }
+      // Reset the watchdog on every event so it only fires after a true
+      // period of silence (no backend activity for WATCHDOG_MS ms).
+      resetWatchdog();
 
       if (ev.event === "delta") {
         if (suppressStreamUntilTurnEndRef.current) return;
@@ -741,10 +769,14 @@ export function useNanobotStream(
         }
         setRunStartedAt(null);
         // Definitive signal that the turn is fully complete.  Cancel any
-        // pending debounce timer and stop the loading indicator immediately.
+        // pending debounce or watchdog timers and stop the loading indicator.
         if (streamEndTimerRef.current !== null) {
           clearTimeout(streamEndTimerRef.current);
           streamEndTimerRef.current = null;
+        }
+        if (watchdogTimerRef.current !== null) {
+          clearTimeout(watchdogTimerRef.current);
+          watchdogTimerRef.current = null;
         }
         setIsStreaming(false);
         setMessages((prev) => {
@@ -984,6 +1016,15 @@ export function useNanobotStream(
       // Mark streaming immediately so the UI shows the loading indicator
       // right away, before the first delta arrives from the server.
       setIsStreaming(true);
+      // Start watchdog: if no turn_end arrives within WATCHDOG_MS, auto-reset.
+      if (watchdogTimerRef.current !== null) clearTimeout(watchdogTimerRef.current);
+      watchdogTimerRef.current = setTimeout(() => {
+        watchdogTimerRef.current = null;
+        setIsStreaming(false);
+        setMessages((prev) =>
+          prev.map((m) => (m.isStreaming ? { ...m, isStreaming: false } : m)),
+        );
+      }, WATCHDOG_MS);
       const wireMedia = hasImages ? images!.map((i) => i.media) : undefined;
       if (options) {
         client.sendMessage(chatId, content, wireMedia, options);

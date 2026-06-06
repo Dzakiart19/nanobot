@@ -543,6 +543,30 @@ class SessionManager:
             "messages": session.messages,
         }
 
+    @staticmethod
+    def _safe_json_line(obj: Any) -> str:
+        """Serialize obj to a JSON line, sanitizing lone surrogate characters.
+
+        Some LLM responses contain lone surrogate code points that are valid in
+        Python str objects but cannot be encoded as UTF-8.  We first try the
+        fast path (ensure_ascii=False); if the resulting string contains
+        surrogates that the UTF-8 codec rejects, we encode with
+        ``errors='replace'`` so replacement characters (U+FFFD) are written
+        instead of crashing the save.
+        """
+        try:
+            line = json.dumps(obj, ensure_ascii=False)
+            line.encode("utf-8")
+            return line + "\n"
+        except (UnicodeEncodeError, UnicodeDecodeError, ValueError):
+            pass
+        try:
+            line = json.dumps(obj, ensure_ascii=False)
+            safe = line.encode("utf-8", errors="replace").decode("utf-8")
+            return safe + "\n"
+        except Exception:
+            return json.dumps(obj, ensure_ascii=True) + "\n"
+
     def save(self, session: Session, *, fsync: bool = False) -> None:
         """Save a session to disk atomically.
 
@@ -566,9 +590,9 @@ class SessionManager:
                     "metadata": session.metadata,
                     "last_consolidated": session.last_consolidated
                 }
-                f.write(json.dumps(metadata_line, ensure_ascii=False) + "\n")
+                f.write(self._safe_json_line(metadata_line))
                 for msg in session.messages:
-                    f.write(json.dumps(msg, ensure_ascii=False) + "\n")
+                    f.write(self._safe_json_line(msg))
                 if fsync:
                     f.flush()
                     os.fsync(f.fileno())
