@@ -1029,6 +1029,7 @@ function naturalizeCommand(command: string): string | null {
 
   if (!stripped) return null;
 
+  // Environment setup
   if (/^export\s+PATH=/i.test(stripped) || /^export\s+\w+=.*&&\s*export\s+PATH=/i.test(stripped)) {
     return "Setting up environment";
   }
@@ -1036,35 +1037,108 @@ function naturalizeCommand(command: string): string | null {
     return "Configuring environment";
   }
 
-  const installMatch = /(?:npm install|npm i|yarn add|pnpm (install|add)|pip install|pip3 install|apt(?:-get)? install|brew install)\s*(.*)/i.exec(stripped);
+  // Python / absolute-path python inline script
+  const pythonInline = /(?:^|&&\s*)(?:\/[\w/.-]+\/)?python3?(?:\.\d+)?\s+-c\s+["'](.{0,120})/i.exec(stripped);
+  if (pythonInline) {
+    const code = pythonInline[1];
+    if (/makedirs|mkdir|os\.path/.test(code)) return "Creating directory";
+    if (/open\s*\(.*["\']w["\']|\.write\s*\(/.test(code)) return "Writing file";
+    if (/json\.(load|dump)|yaml\.(safe_)?load/.test(code)) return "Processing data";
+    return "Running Python script";
+  }
+
+  // npm init (must precede npm i check to avoid false match)
+  if (/npm\s+init/i.test(stripped)) {
+    if (/&&/.test(stripped) && /npm\s+install|npm\s+i\b|yarn\s+add|pnpm\s+(?:install|add)/i.test(stripped)) {
+      const pkgMatch = /(?:npm install|npm i\b|yarn add|pnpm (?:install|add))\s+([\w@./-][\w @./-]*)/i.exec(stripped);
+      const packages = pkgMatch ? truncateMiddle(pkgMatch[1].replace(/--\S+/g, "").trim(), 40) : "";
+      return packages ? `Setting up project with ${packages}` : "Setting up project";
+    }
+    return "Initializing project";
+  }
+
+  // Package install — `npm i` only as standalone flag (not inside npm init)
+  const installMatch = /(?:npm install|npm i(?=\s)|yarn add|pnpm (?:install|add)|pip3? install|apt(?:-get)? install|brew install|cargo add)\s*(.*)/i.exec(stripped);
   if (installMatch) {
-    const packages = (installMatch[2] || "").replace(/--[^\s]+/g, "").trim();
+    const packages = (installMatch[1] || "").replace(/--\S+/g, "").trim().split(/\s+/).slice(0, 4).join(" ");
     return packages ? `Installing ${truncateMiddle(packages, 48)}` : "Installing packages";
   }
 
+  // npm / yarn run script
   const npmRunMatch = /npm run\s+(\S+)/i.exec(stripped);
   if (npmRunMatch) return `Running ${npmRunMatch[1]}`;
 
+  // Build tools
   const buildMatch = /\b(tsc|next build|vite build|webpack|cargo build|go build|mvn package|gradle build)\b/i.exec(stripped);
   if (buildMatch) return `Building (${buildMatch[1]})`;
 
+  // mkdir compound (scaffold) — must precede simple mkdir
+  if (/mkdir/.test(stripped) && /&&/.test(stripped)) {
+    if (/npm|yarn|pnpm/.test(stripped)) return "Setting up project";
+    return "Creating project structure";
+  }
+
+  // Simple mkdir
   const mkdirMatch = /^mkdir\s+(-p\s+)?(.+)$/.exec(stripped);
   if (mkdirMatch) {
     const dir = compactShellPath(mkdirMatch[2].trim());
     return `Creating directory: ${truncateMiddle(dir, 48)}`;
   }
 
+  // which / command -v / type / env probe
   if (/^which\s+/.test(stripped) || /^command\s+-v\s+/.test(stripped) || /^type\s+/.test(stripped)) {
     return "Checking installed tools";
   }
+  if (/echo\s+\$PATH|ls\s+\/nix\/store|command\s+-v/.test(stripped)) {
+    return "Checking environment";
+  }
 
+  // echo alone
   if (/^echo\s+/.test(stripped) && !/&&/.test(stripped)) {
     return "Checking environment";
   }
 
+  // head / tail pipe
   if (/\|?\s*head\s+-\d+/.test(stripped) || /\|?\s*tail\s+-\d+/.test(stripped)) {
     return "Reading output";
   }
+
+  // git commands
+  const gitMatch = /git\s+(clone|init|add|commit|push|pull|checkout|status|log|diff|merge|stash)\b/i.exec(stripped);
+  if (gitMatch) {
+    const opMap: Record<string, string> = {
+      clone: "Cloning repository", init: "Initializing repository",
+      add: "Staging changes", commit: "Committing changes",
+      push: "Pushing changes", pull: "Pulling changes",
+      checkout: "Switching branch", status: "Checking status",
+      log: "Reading history", diff: "Comparing changes",
+      merge: "Merging", stash: "Stashing changes",
+    };
+    return opMap[gitMatch[1].toLowerCase()] ?? `Running git ${gitMatch[1]}`;
+  }
+
+  // curl / wget download
+  const curlMatch = /\b(?:curl|wget)\b.*?(https?:\/\/[^\s"']+)/i.exec(stripped);
+  if (curlMatch) {
+    try { return `Downloading from ${new URL(curlMatch[1]).hostname}`; } catch { return "Downloading file"; }
+  }
+
+  // node script
+  const nodeMatch = /^(?:node|nodejs)\s+(\S+\.(?:js|mjs|cjs))/i.exec(stripped);
+  if (nodeMatch) return `Running ${nodeMatch[1]}`;
+
+  // cat (read file)
+  const catMatch = /^cat\s+(\S+)$/.exec(stripped);
+  if (catMatch) return `Reading ${compactShellPath(catMatch[1])}`;
+
+  // File-system primitives
+  if (/^chmod\s+/.test(stripped)) return "Setting permissions";
+  if (/^touch\s+/.test(stripped)) return "Creating file";
+  if (/^cp\s+/.test(stripped)) return "Copying file";
+  if (/^mv\s+/.test(stripped)) return "Moving file";
+  if (/^rm\s+/.test(stripped)) return "Removing file";
+  if (/^ls(?:\s|$)/.test(stripped) && !/&&/.test(stripped)) return "Listing files";
+  if (/^cd\s+/.test(stripped) && !/&&/.test(stripped)) return "Changing directory";
 
   return null;
 }
