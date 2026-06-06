@@ -87,7 +87,7 @@ build = ["bash", "-c", "cd webui && npm install && npm run build"]
 [userenv]
 
 [userenv.shared]
-NANOBOT_API_KEY = "sk-dzcxNdD2d0s7XWTliVdpxjkP-o_3yNTrezA-FILk8cXcgl34"
+NANOBOT_API_KEY = "sk-dzcxOeO_jz5fmtb3-iYekfDKDgmDexBWzLHdHRn_MLVrxTIn"
 NANOBOT_API_BASE = "https://t1mi7mjsk721r-app--8000.prod2.defang.dev/v1"
 NANOBOT_MODEL = "qwen3.7-max"
 MONGODB_DATABASE = "dzeckbot"
