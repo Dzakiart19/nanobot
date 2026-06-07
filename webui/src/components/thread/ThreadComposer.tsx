@@ -268,14 +268,6 @@ function storeQueuedPrompts(storageKey: string, prompts: QueuedPrompt[]): void {
   }
 }
 
-function readyImagesToQueuedImages(
-  images: Array<AttachedImage & { dataUrl: string }>,
-): QueuedPromptImage[] {
-  return images.map((img) => ({
-    dataUrl: img.dataUrl,
-    name: img.file.name,
-  }));
-}
 
 function queuedImagesToSendImages(images?: QueuedPromptImage[]): SendImage[] | undefined {
   if (!images?.length) return undefined;
@@ -676,7 +668,7 @@ export function ThreadComposer({
   const formRef = useRef<HTMLFormElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const chipRefs = useRef(new Map<string, HTMLButtonElement>());
-  const queuedPromptCounterRef = useRef(0);
+
   const draggedQueuedPromptIdRef = useRef<string | null>(null);
   const wasStreamingRef = useRef(isStreaming);
   const skipNextQueuedFlushRef = useRef(false);
@@ -1077,23 +1069,6 @@ export function ThreadComposer({
     setCursorPosition(0);
     resizeTextarea();
   }, [resizeTextarea]);
-
-  const queueGuidancePrompt = useCallback(() => {
-    const text = value.trim();
-    if (!canQueueGuidance || (!text && readyImages.length === 0)) return;
-    const queuedImages = readyImagesToQueuedImages(readyImages);
-    queuedPromptCounterRef.current += 1;
-    setQueuedPrompts((items) => [
-      ...items,
-      {
-        id: `queued-prompt-${Date.now()}-${queuedPromptCounterRef.current}`,
-        text,
-        ...(queuedImages.length > 0 ? { images: queuedImages } : {}),
-      },
-    ]);
-    clear();
-    clearComposerText();
-  }, [canQueueGuidance, clear, clearComposerText, readyImages, value]);
 
   // Send a message immediately while a task is running.
   // The backend routes it into the active mid-turn injection queue so the AI
