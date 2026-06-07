@@ -1273,7 +1273,9 @@ export function ThreadComposer({
         return;
       }
     }
-    if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
+    // On touch/mobile devices Enter inserts a newline — send via the button.
+    const isTouchDevice = navigator.maxTouchPoints > 0;
+    if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing && !isTouchDevice) {
       e.preventDefault();
       if (canQueueGuidance) {
         queueGuidancePrompt();
