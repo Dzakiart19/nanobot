@@ -50,6 +50,16 @@ check_bin "curl"    "skill: weather"
 check_bin "python3" "core agent"
 check_bin "pip"     "core agent"
 
+# ── System utilities (declared in replit.nix — always available) ──────────────
+echo ""
+echo "Checking system utilities..."
+check_bin "wget"   "file download"
+check_bin "rsync"  "file sync"
+check_bin "zip"    "archive"
+check_bin "unzip"  "archive"
+check_bin "tree"   "directory listing"
+check_bin "bc"     "math"
+
 # ── 3. summarize CLI ──────────────────────────────────────────────────────────
 # steipete/summarize only ships macOS binaries — no Linux release available.
 # We try an npm fallback; if that also fails the skill degrades to LLM fallback.
