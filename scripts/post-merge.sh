@@ -7,3 +7,6 @@ bash "$(dirname "$0")/install.sh"
 # Install frontend dependencies (non-interactive)
 cd webui && npm install --yes 2>/dev/null || true
 cd ..
+
+# Regenerate requirements.txt so Replit's build system uses pip (not UV backend)
+uv pip compile pyproject.toml -o requirements.txt --quiet 2>/dev/null || true
