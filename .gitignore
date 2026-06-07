@@ -58,7 +58,7 @@ coverage.xml
 
 # Lock files (project policy)
 poetry.lock
-uv.lock
+# uv.lock is committed intentionally — Replit's UPM needs it during build
 
 # Jupyter
 .ipynb_checkpoints/
