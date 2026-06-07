@@ -548,11 +548,29 @@ class ExecTool(Tool):
                     env[key] = val
             return env
         home = os.environ.get("HOME", "/tmp")
+
+        # Build an extended PATH that includes NixOS-specific locations
+        # not always present in login-shell profiles on Replit/NixOS.
+        _nix_extra = [
+            "/run/current-system/sw/bin",
+            "/nix/var/nix/profiles/default/bin",
+            "/usr/local/bin",
+            "/usr/bin",
+            "/bin",
+            "/usr/sbin",
+            "/sbin",
+        ]
+        process_path = os.environ.get("PATH", "")
+        existing_dirs = set(process_path.split(os.pathsep)) if process_path else set()
+        extra = [d for d in _nix_extra if d not in existing_dirs]
+        full_path = os.pathsep.join(filter(None, [process_path] + extra))
+
         env = {
             "HOME": home,
             "LANG": os.environ.get("LANG", "C.UTF-8"),
             "TERM": os.environ.get("TERM", "dumb"),
             "PYTHONUNBUFFERED": "1",
+            "PATH": full_path,
         }
         for key in self.allowed_env_keys:
             val = os.environ.get(key)
