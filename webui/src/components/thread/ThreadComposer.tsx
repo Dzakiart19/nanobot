@@ -1095,6 +1095,24 @@ export function ThreadComposer({
     clearComposerText();
   }, [canQueueGuidance, clear, clearComposerText, readyImages, value]);
 
+  // Send a message immediately while a task is running.
+  // The backend routes it into the active mid-turn injection queue so the AI
+  // picks it up right away without waiting for the current turn to finish.
+  const sendMidTurn = useCallback(() => {
+    const text = value.trim();
+    if (!canQueueGuidance || (!text && readyImages.length === 0)) return;
+    const payload =
+      readyImages.length > 0
+        ? readyImages.map((img) => ({
+            media: { data_url: img.dataUrl, name: img.file.name },
+            preview: { url: img.dataUrl, name: img.file.name },
+          }))
+        : undefined;
+    onSend(text, payload);
+    clear();
+    clearComposerText();
+  }, [canQueueGuidance, clear, clearComposerText, onSend, readyImages, value]);
+
   const removeQueuedPrompt = useCallback((id: string) => {
     setQueuedPrompts((items) => items.filter((item) => item.id !== id));
     requestAnimationFrame(() => textareaRef.current?.focus());
@@ -1278,7 +1296,7 @@ export function ThreadComposer({
     if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing && !isTouchDevice) {
       e.preventDefault();
       if (canQueueGuidance) {
-        queueGuidancePrompt();
+        sendMidTurn();
         return;
       }
       submit();
@@ -1562,7 +1580,7 @@ export function ThreadComposer({
               size="icon"
               disabled={showStopButton ? disabled : showQueueSend ? false : !canSend}
               aria-label={showStopButton ? t("thread.composer.stop") : t("thread.composer.send")}
-              onClick={showStopButton ? handleStop : showQueueSend ? queueGuidancePrompt : undefined}
+              onClick={showStopButton ? handleStop : showQueueSend ? sendMidTurn : undefined}
               className={cn(
                 "rounded-full transition-transform",
                 showStopButton
