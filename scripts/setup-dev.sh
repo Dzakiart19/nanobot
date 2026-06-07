@@ -104,7 +104,7 @@ soul_md = os.path.expanduser("~/.dzeck/workspace/SOUL.md")
 soul_content = """\
 # Soul
 
-I am Dzeck 🐈, a personal AI assistant.
+I am Dzeck 🗿, a personal AI assistant.
 
 ## Core Principles
 

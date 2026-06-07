@@ -8,9 +8,9 @@ from dzeck.cli.commands import SafeFileHistory, _sanitize_surrogates
 
 class TestSanitizeSurrogates:
     def test_paired_surrogates_reconstructed(self):
-        """Windows console produces \\ud83d\\udc08 for U+1F408 — must be restored."""
-        result = _sanitize_surrogates("你为什么会用 🐈")
-        assert result == "你为什么会用 🐈"
+        """Windows console produces \\ud83d\\uddff for U+1F5FF — must be restored."""
+        result = _sanitize_surrogates("你为什么会用 🗿")
+        assert result == "你为什么会用 🗿"
 
     def test_lone_surrogates_replaced(self):
         result = _sanitize_surrogates("hello \udce9 world")
@@ -23,7 +23,7 @@ class TestSanitizeSurrogates:
 
     def test_emoji_already_correct(self):
         """Properly encoded emoji should pass through unchanged."""
-        assert _sanitize_surrogates("hello 🐈 dzeck") == "hello 🐈 dzeck"
+        assert _sanitize_surrogates("hello 🗿 dzeck") == "hello 🗿 dzeck"
 
     def test_mixed_unicode_preserved(self):
         assert _sanitize_surrogates("你好 hello こんにちは 🎉") == "你好 hello こんにちは 🎉"
@@ -53,9 +53,9 @@ class TestSafeFileHistory:
 
     def test_emoji_preserved(self, tmp_path):
         hist = SafeFileHistory(str(tmp_path / "history"))
-        hist.store_string("hello 🐈 dzeck")
+        hist.store_string("hello 🗿 dzeck")
         entries = list(hist.load_history_strings())
-        assert entries[0] == "hello 🐈 dzeck"
+        assert entries[0] == "hello 🗿 dzeck"
 
     def test_mixed_unicode_preserved(self, tmp_path):
         """CJK + emoji + latin should all pass through cleanly."""

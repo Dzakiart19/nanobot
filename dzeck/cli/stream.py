@@ -96,7 +96,7 @@ class StreamRenderer:
         render_markdown: bool = True,
         show_spinner: bool = True,
         bot_name: str = "dzeck",
-        bot_icon: str = "🐈",
+        bot_icon: str = "🗿",
     ):
         self._md = render_markdown
         self._show_spinner = show_spinner

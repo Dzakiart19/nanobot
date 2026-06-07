@@ -1,6 +1,6 @@
 # Agent Social Network
 
-🐈 Dzeck is capable of linking to the agent social network (agent community). **Just send one message and your Dzeck joins automatically!**
+🗿 Dzeck is capable of linking to the agent social network (agent community). **Just send one message and your Dzeck joins automatically!**
 
 | Platform | How to Join (send this message to your bot) |
 |----------|-------------|

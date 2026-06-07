@@ -17,6 +17,37 @@ _STRIP_SKILL_FRONTMATTER = re.compile(
     re.DOTALL,
 )
 
+# Extra binary search paths for NixOS/Replit and other non-standard environments
+# where the Python process PATH may not include all system binary locations.
+_EXTRA_BINARY_PATHS = [
+    "/run/current-system/sw/bin",
+    "/nix/var/nix/profiles/default/bin",
+    "/usr/local/bin",
+    "/usr/bin",
+    "/bin",
+    "/usr/sbin",
+    "/sbin",
+]
+
+
+def _resolve_binary(cmd: str) -> str | None:
+    """Resolve a binary using an extended PATH that covers NixOS/Replit layouts.
+
+    ``shutil.which`` uses only the current process PATH, which on NixOS may
+    omit system-wide profile directories.  This helper appends common locations
+    so that tools that are genuinely installed are not falsely reported as missing.
+    """
+    result = shutil.which(cmd)
+    if result:
+        return result
+    current_path = os.environ.get("PATH", "")
+    existing_dirs = set(current_path.split(os.pathsep)) if current_path else set()
+    extra = [p for p in _EXTRA_BINARY_PATHS if p not in existing_dirs]
+    if not extra:
+        return None
+    extended_path = current_path + os.pathsep + os.pathsep.join(extra)
+    return shutil.which(cmd, path=extended_path)
+
 
 class SkillsLoader:
     """
@@ -147,7 +178,7 @@ class SkillsLoader:
         required_bins = requires.get("bins", [])
         required_env_vars = requires.get("env", [])
         return ", ".join(
-            [f"CLI: {command_name}" for command_name in required_bins if not shutil.which(command_name)]
+            [f"CLI: {command_name}" for command_name in required_bins if not _resolve_binary(command_name)]
             + [f"ENV: {env_name}" for env_name in required_env_vars if not os.environ.get(env_name)]
         )
 
@@ -191,7 +222,7 @@ class SkillsLoader:
         requires = skill_meta.get("requires", {})
         required_bins = requires.get("bins", [])
         required_env_vars = requires.get("env", [])
-        return all(shutil.which(cmd) for cmd in required_bins) and all(
+        return all(_resolve_binary(cmd) for cmd in required_bins) and all(
             os.environ.get(var) for var in required_env_vars
         )
 

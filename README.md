@@ -31,7 +31,7 @@
   </p>
 </div>
 
-🐈 **Dzeck** is an open-source, ultra-lightweight agent runtime for people who want to own their AI agent stack. It gives you a small, readable core plus the practical pieces for real long-running agents: WebUI, chat channels, tools, memory, MCP, model routing, and deployment.
+🗿 **Dzeck** is an open-source, ultra-lightweight agent runtime for people who want to own their AI agent stack. It gives you a small, readable core plus the practical pieces for real long-running agents: WebUI, chat channels, tools, memory, MCP, model routing, and deployment.
 
 ## 📢 News
 
@@ -67,7 +67,7 @@
 - **2026-05-05** 🛡️ Quiet deny for unknown Telegram chats, Dream cleanup, fuller automation summaries.
 - **2026-05-04** 🔐 Safer DingTalk outbound media links, durable cron persistence, DeepSeek polish.
 - **2026-05-03** ⚙️ Predictable shell allow-list behavior, isolated chats mid-reply, cleaner interactive retries.
-- **2026-05-02** 🐈 LongCat support, smarter token sizing hints, clearer bundled upgrade guidance.
+- **2026-05-02** 🗿 LongCat support, smarter token sizing hints, clearer bundled upgrade guidance.
 - **2026-05-01** ☁️ Native AWS Bedrock provider, tighter helper handoffs and scoped session files.
 - **2026-04-30** 💬 Feishu threads that honor replies and topics, WhatsApp bridge refresh on source edits.
 - **2026-04-29** 🚀 Released **v0.1.5.post3** — Smarter threads on Feishu, Discord, Slack, and Teams; **DeepSeek-V4**; Hugging Face & Olostep; choices, `/history`, and steadier long chats. Please see [release notes](https://github.com/HKUDS/Dzeck/releases/tag/v0.1.5.post3) for details.
@@ -156,7 +156,7 @@
 - **2026-02-05** ✨ Added Feishu channel, DeepSeek provider, and enhanced scheduled tasks support!
 - **2026-02-04** 🚀 Released **v0.1.3.post4** with multi-provider & Docker support! Check [here](https://github.com/HKUDS/Dzeck/releases/tag/v0.1.3.post4) for details.
 - **2026-02-03** ⚡ Integrated vLLM for local LLM support and improved natural language task scheduling!
-- **2026-02-02** 🎉 Dzeck officially launched! Welcome to try 🐈 Dzeck!
+- **2026-02-02** 🎉 Dzeck officially launched! Welcome to try 🗿 Dzeck!
 
 </details>
 
@@ -278,7 +278,7 @@ Visit [`http://127.0.0.1:8765`](http://127.0.0.1:8765) in your browser. To open 
   <img src="images/Dzeck_arch.png" alt="Dzeck architecture" width="800">
 </p>
 
-🐈 Dzeck stays lightweight by centering everything around a small agent loop: messages come in from chat apps, the LLM decides when tools are needed, and memory or skills are pulled in only as context instead of becoming a heavy orchestration layer. That keeps the core path readable and easy to extend, while still letting you add channels, tools, memory, and deployment options without turning the system into a monolith.
+🗿 Dzeck stays lightweight by centering everything around a small agent loop: messages come in from chat apps, the LLM decides when tools are needed, and memory or skills are pulled in only as context instead of becoming a heavy orchestration layer. That keeps the core path readable and easy to extend, while still letting you add channels, tools, memory, and deployment options without turning the system into a monolith.
 
 ## ✨ Features
 

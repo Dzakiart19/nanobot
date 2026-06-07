@@ -7,11 +7,11 @@ from dzeck.config.schema import AgentDefaults, Config
 
 
 def test_bot_name_and_icon_defaults_preserve_current_branding() -> None:
-    """Default values keep the existing 'dzeck' name and cat icon."""
+    """Default values keep the existing 'dzeck' name and moai icon."""
     defaults = AgentDefaults()
 
     assert defaults.bot_name == "dzeck"
-    assert defaults.bot_icon == "🐈"
+    assert defaults.bot_icon == "🗿"
 
 
 def test_bot_name_and_icon_can_be_overridden_via_config() -> None:
