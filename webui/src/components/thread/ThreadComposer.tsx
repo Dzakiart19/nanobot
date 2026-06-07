@@ -1329,7 +1329,11 @@ export function ThreadComposer({
   );
 
   const attachButtonDisabled = disabled || full;
-  const showStopButton = isStreaming && !!onStop;
+  // When the user has typed something while streaming, show Send (queue) instead of Stop.
+  // A separate small Stop button appears so the user can still cancel.
+  const showStopButton = isStreaming && !!onStop && !canQueueGuidance;
+  const showQueueSend = isStreaming && canQueueGuidance;
+  const showSmallStop = isStreaming && !!onStop && canQueueGuidance;
   const relaxedHeroInput = isHero && images.length === 0 && !isStreaming;
   const inputTextClasses = cn(
     "w-full resize-none bg-transparent",
@@ -1538,12 +1542,27 @@ export function ThreadComposer({
                 isHero={isHero}
               />
             ) : null}
+            {showSmallStop ? (
+              <Button
+                type="button"
+                size="icon"
+                disabled={disabled}
+                aria-label={t("thread.composer.stop")}
+                onClick={handleStop}
+                className={cn(
+                  "rounded-full transition-transform border border-border/70 bg-card text-foreground/85 shadow-[0_3px_10px_rgba(15,23,42,0.08)] hover:bg-muted/65 hover:text-foreground hover:scale-[1.03] active:scale-95",
+                  isHero ? "h-8 w-8" : "h-9 w-9",
+                )}
+              >
+                <Square className={cn("fill-current stroke-current", isHero ? "h-3 w-3" : "h-3.5 w-3.5")} />
+              </Button>
+            ) : null}
             <Button
               type={showStopButton ? "button" : "submit"}
               size="icon"
-              disabled={showStopButton ? disabled : !canSend}
+              disabled={showStopButton ? disabled : showQueueSend ? false : !canSend}
               aria-label={showStopButton ? t("thread.composer.stop") : t("thread.composer.send")}
-              onClick={showStopButton ? handleStop : undefined}
+              onClick={showStopButton ? handleStop : showQueueSend ? queueGuidancePrompt : undefined}
               className={cn(
                 "rounded-full transition-transform",
                 showStopButton
@@ -1552,13 +1571,11 @@ export function ThreadComposer({
                     ? "border border-foreground bg-foreground text-background shadow-[0_4px_12px_rgba(15,23,42,0.20)] hover:bg-foreground/90 disabled:border-foreground/35 disabled:bg-foreground/35 disabled:text-background/80"
                     : "border border-foreground bg-foreground text-background shadow-[0_3px_10px_rgba(15,23,42,0.18)] hover:bg-foreground/90 disabled:border-foreground/35 disabled:bg-foreground/35 disabled:text-background/80",
                 isHero ? "h-8 w-8" : "h-9 w-9",
-                (canSend || showStopButton) && "hover:scale-[1.03] active:scale-95",
+                (canSend || showStopButton || showQueueSend) && "hover:scale-[1.03] active:scale-95",
               )}
             >
               {showStopButton ? (
                 <Square className={cn("fill-current stroke-current", isHero ? "h-3 w-3" : "h-3.5 w-3.5")} />
-              ) : isStreaming ? (
-                <Loader2 className={cn(isHero ? "h-4 w-4" : "h-4 w-4", "animate-spin")} />
               ) : (
                 <ArrowUp className={cn(isHero ? "h-4 w-4" : "h-4 w-4")} />
               )}
